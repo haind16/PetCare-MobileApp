@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-feature android:name="android.hardware.camera" android:required="false"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+
+        <activity
+            android:name=".WelcomeActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".ui.auth.LoginActivity"/>
+        <activity android:name=".ui.auth.RegisterActivity"/>
+        <activity android:name=".ui.auth.ForgotPasswordActivity"/>
+        <activity android:name=".ui.main.MainActivity"/>
+        <activity android:name=".ui.auth.ForgotPasswordActivity"/>
+        <activity android:name=".ui.auth.ResetPasswordActivity"/>
+        <activity android:name=".ui.health.AddReminderActivity"/>
+        <activity android:name=".ui.health.ReminderDetailActivity"/>
+        <activity android:name=".ui.interactive.InteractActivity"/>
+        <activity android:name=".ui.interactive.SoundListActivity"/>
+        <activity android:name=".ui.profile.ProfileDetailActivity"/>
+        <activity android:name=".ui.profile.LanguageActivity"/>
+        <activity android:name=".ui.pet.list.PetListActivity"/>
+        <activity android:name=".ui.profile.ChangePasswordActivity"/>
+        <activity android:name=".ui.pet.profile.AddPetActivity"/>
+        <activity android:name=".ui.pet.profile.PetProfileActivity"/>
+        <activity android:name=".ui.pet.profile.EditPetActivity"/>
+        <activity android:name=".ui.pet.health.WeightActivity"/>
+        <activity android:name=".ui.pet.health.AddWeightActivity"/>
+        <activity android:name=".ui.pet.health.WeightActivity"/>
+        <activity android:name=".ui.pet.health.AddWeightActivity"/>
+        <activity android:name=".ui.pet.health.VaccineActivity"/>
+        <activity android:name=".ui.pet.health.DewormingActivity"/>
+        <activity android:name=".ui.pet.health.AllergyActivity"/>
+        <activity android:name=".ui.pet.health.DiseaseActivity"/>
+        <activity android:name=".ui.pet.health.PrescriptionActivity"/>
+
+    </application>
+</manifest>
