@@ -1,11 +1,14 @@
 package com.nhom08.petcare.ui.main;
 
+import android.content.Intent;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import com.nhom08.petcare.R;
 import com.nhom08.petcare.databinding.ActivityMainBinding;
+import com.nhom08.petcare.ui.community.CommunityFragment;
 import com.nhom08.petcare.ui.profile.ProfileFragment;
+import com.nhom08.petcare.ui.shop.ShopFragment;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -17,22 +20,41 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // Set Home được chọn mặc định TRƯỚC khi set listener
         binding.bottomNav.setSelectedItemId(R.id.nav_home);
-
-        // Load HomeFragment mặc định
         loadFragment(new HomeFragment());
 
-        // Listener SAU khi set selected
         binding.bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.nav_home) {
                 loadFragment(new HomeFragment());
             } else if (id == R.id.nav_profile) {
                 loadFragment(new ProfileFragment());
+            } else if (id == R.id.nav_shop) {
+                loadFragment(new ShopFragment());
+            } else if (id == R.id.nav_chat) {
+            loadFragment(new CommunityFragment());
             }
             return true;
         });
+
+        // Kiểm tra nếu được mở từ thanh toán
+        handleIntent(getIntent());
+    }
+
+    // Nhận intent khi activity đang chạy
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        handleIntent(intent);
+    }
+
+    private void handleIntent(Intent intent) {
+        if (intent == null) return;
+        String navTo = intent.getStringExtra("nav_to");
+        if ("shop".equals(navTo)) {
+            binding.bottomNav.setSelectedItemId(R.id.nav_shop);
+            loadFragment(new ShopFragment());
+        }
     }
 
     private void loadFragment(Fragment fragment) {

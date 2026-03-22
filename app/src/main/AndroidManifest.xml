@@ -57,6 +57,12 @@
         <activity android:name=".ui.pet.health.AddAllergyActivity"/>
         <activity android:name=".ui.pet.health.AddDiseaseActivity"/>
         <activity android:name=".ui.pet.health.AddPrescriptionActivity"/>
+        <activity android:name=".ui.shop.CartActivity"/>
+        <activity android:name=".ui.shop.CheckoutActivity"/>
+        <activity android:name=".ui.shop.QRPaymentActivity"/>
+        <activity android:name=".ui.shop.BankTransferActivity"/>
+        <activity android:name=".ui.community.PostDetailActivity"/>
+        <activity android:name=".ui.community.CreatePostActivity"/>
 
     </application>
 </manifest>

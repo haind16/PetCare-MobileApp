@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F5F5F5">
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@color/primary_blue"
+        android:gravity="center_vertical"
+        android:paddingTop="14dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="PET COMMUNITY"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"/>
+
+        <ImageView
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:src="@drawable/ic_bell"
+            android:tint="@color/white"/>
+    </LinearLayout>
+
+    <!-- Ô đăng bài -->
+    <androidx.cardview.widget.CardView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="0dp"
+        app:cardElevation="2dp"
+        android:layout_marginBottom="4dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="12dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="8dp">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/pet_welcome"
+                    android:layout_marginEnd="12dp"/>
+
+                <TextView
+                    android:id="@+id/etPostHint"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/edit_text_border"
+                    android:gravity="center_vertical"
+                    android:paddingStart="12dp"
+                    android:text="Bạn đang nghĩ gì về thú cưng?"
+                    android:textColor="#888888"
+                    android:textSize="14sp"/>
+            </LinearLayout>
+
+            <!-- Nút Ảnh + Đăng -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="end">
+
+                <Button
+                    android:id="@+id/btnPost"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:background="@drawable/bg_orange_btn"
+                    android:text="Đăng"
+                    android:textColor="@color/white"
+                    android:textSize="12sp"
+                    android:textAllCaps="false"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"/>
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Danh sách bài viết -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvPosts"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"/>
+
+</LinearLayout>

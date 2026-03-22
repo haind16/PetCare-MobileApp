@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F5F5F5">
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@color/primary_blue"
+        android:gravity="center_vertical"
+        android:paddingTop="14dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="PET SHOP"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold"/>
+
+        <ImageView
+            android:id="@+id/btnCart"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:src="@drawable/ic_cart"
+            android:tint="@color/white"/>
+    </LinearLayout>
+
+    <!-- Thanh tìm kiếm -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@color/white"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/edit_text_border"
+            android:gravity="center_vertical"
+            android:paddingStart="12dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@drawable/ic_search"
+                android:tint="#888888"/>
+
+            <EditText
+                android:id="@+id/etSearch"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@null"
+                android:hint="Tìm sản phẩm cho thú cưng..."
+                android:textSize="13sp"
+                android:paddingStart="8dp"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Danh mục -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/white"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
+
+        <LinearLayout
+            android:id="@+id/btnCatFood"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_icon_blue"
+                android:gravity="center"
+                android:text="🍖"
+                android:textSize="22sp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Thức ăn"
+                android:textSize="11sp"
+                android:layout_marginTop="4dp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/btnAccessory"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_icon_pink"
+                android:gravity="center"
+                android:text="🎀"
+                android:textSize="22sp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Phụ kiện"
+                android:textSize="11sp"
+                android:layout_marginTop="4dp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/btnMedicine"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_icon_yellow"
+                android:gravity="center"
+                android:text="💊"
+                android:textSize="22sp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Thuốc"
+                android:textSize="11sp"
+                android:layout_marginTop="4dp"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Danh sách sản phẩm -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Danh sách sản phẩm"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:paddingStart="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="8dp"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvProducts"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="8dp"
+        android:clipToPadding="false"/>
+
+</LinearLayout>

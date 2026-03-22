@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/white">
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@color/primary_blue"
+        android:gravity="center_vertical"
+        android:paddingTop="14dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="16dp">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:padding="4dp"
+            android:src="@drawable/ic_back"
+            android:tint="@color/white"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="Thanh toán QR"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginEnd="32dp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Quét mã QR để thanh toán"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:id="@+id/tvAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Số tiền: 385,000đ"
+            android:textSize="18sp"
+            android:textColor="#FF5722"
+            android:textStyle="bold"
+            android:layout_marginBottom="24dp"/>
+
+        <!-- Hiển thị ảnh QR -->
+        <ImageView
+            android:id="@+id/imgQR"
+            android:layout_width="280dp"
+            android:layout_height="280dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/viet_qr"
+            android:layout_marginBottom="16dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ngân hàng: Vietcombank\nSố TK: 1234567890\nChủ TK: PETCARE SHOP"
+            android:textSize="14sp"
+            android:textColor="#555555"
+            android:gravity="center"
+            android:layout_marginBottom="24dp"/>
+
+        <Button
+            android:id="@+id/btnConfirmPaid"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:background="@drawable/bg_interact_btn"
+            android:text="Đã thanh toán"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textAllCaps="false"
+            android:textStyle="bold"/>
+
+    </LinearLayout>
+</LinearLayout>
