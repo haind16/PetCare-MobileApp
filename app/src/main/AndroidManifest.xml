@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.CALL_PHONE"/>
 
     <application
         android:allowBackup="true"
@@ -30,10 +31,9 @@
         <activity android:name=".ui.auth.RegisterActivity"/>
         <activity android:name=".ui.auth.ForgotPasswordActivity"/>
         <activity android:name=".ui.main.MainActivity"/>
-        <activity android:name=".ui.auth.ForgotPasswordActivity"/>
         <activity android:name=".ui.auth.ResetPasswordActivity"/>
-        <activity android:name=".ui.health.AddReminderActivity"/>
-        <activity android:name=".ui.health.ReminderDetailActivity"/>
+        <activity android:name=".ui.health.reminder.AddReminderActivity"/>
+        <activity android:name=".ui.health.reminder.ReminderDetailActivity"/>
         <activity android:name=".ui.interactive.InteractActivity"/>
         <activity android:name=".ui.interactive.SoundListActivity"/>
         <activity android:name=".ui.profile.ProfileDetailActivity"/>
@@ -43,8 +43,6 @@
         <activity android:name=".ui.pet.profile.AddPetActivity"/>
         <activity android:name=".ui.pet.profile.PetProfileActivity"/>
         <activity android:name=".ui.pet.profile.EditPetActivity"/>
-        <activity android:name=".ui.pet.health.WeightActivity"/>
-        <activity android:name=".ui.pet.health.AddWeightActivity"/>
         <activity android:name=".ui.pet.health.WeightActivity"/>
         <activity android:name=".ui.pet.health.AddWeightActivity"/>
         <activity android:name=".ui.pet.health.VaccineActivity"/>
@@ -63,6 +61,12 @@
         <activity android:name=".ui.shop.BankTransferActivity"/>
         <activity android:name=".ui.community.PostDetailActivity"/>
         <activity android:name=".ui.community.CreatePostActivity"/>
+        <activity android:name=".ui.health.medical.MedicalRecordActivity"/>
+        <activity android:name=".ui.health.diary.DiaryActivity"/>
+        <activity android:name=".ui.health.info.InfoListActivity"/>
+        <activity android:name=".ui.health.info.InfoDetailActivity"/>
+        <activity android:name=".ui.health.diary.AddDiaryActivity"/>
+        <activity android:name=".ui.health.diary.DiaryDetailActivity"/>
 
     </application>
 </manifest>

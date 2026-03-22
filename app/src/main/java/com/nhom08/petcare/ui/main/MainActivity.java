@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 import com.nhom08.petcare.R;
 import com.nhom08.petcare.databinding.ActivityMainBinding;
 import com.nhom08.petcare.ui.community.CommunityFragment;
+import com.nhom08.petcare.ui.health.HealthFragment;
 import com.nhom08.petcare.ui.profile.ProfileFragment;
 import com.nhom08.petcare.ui.shop.ShopFragment;
 
@@ -32,7 +33,9 @@ public class MainActivity extends AppCompatActivity {
             } else if (id == R.id.nav_shop) {
                 loadFragment(new ShopFragment());
             } else if (id == R.id.nav_chat) {
-            loadFragment(new CommunityFragment());
+                loadFragment(new CommunityFragment());
+            } else if (id == R.id.nav_health) {
+                loadFragment(new HealthFragment());
             }
             return true;
         });

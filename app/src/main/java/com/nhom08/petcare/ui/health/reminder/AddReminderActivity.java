@@ -1,4 +1,4 @@
-package com.nhom08.petcare.ui.health;
+package com.nhom08.petcare.ui.health.reminder;
 
 import android.content.Intent;
 import android.os.Bundle;
