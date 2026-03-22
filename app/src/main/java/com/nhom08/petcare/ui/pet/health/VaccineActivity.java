@@ -1,13 +1,18 @@
 package com.nhom08.petcare.ui.pet.health;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import com.nhom08.petcare.databinding.ActivityVaccineBinding;
-import java.util.Calendar;
+import java.util.ArrayList;
+import java.util.List;
 
 public class VaccineActivity extends AppCompatActivity {
+
     private ActivityVaccineBinding binding;
+    private List<HistoryAdapter.HistoryItem> list = new ArrayList<>();
+    private HistoryAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -17,14 +22,27 @@ public class VaccineActivity extends AppCompatActivity {
 
         binding.btnBack.setOnClickListener(v -> finish());
 
-        binding.btnSave.setOnClickListener(v -> {
-            int day = binding.datePicker.getDayOfMonth();
-            int month = binding.datePicker.getMonth() + 1;
-            int year = binding.datePicker.getYear();
-            String date = day + "/" + month + "/" + year;
-            Toast.makeText(this, "Đã lưu ngày tiêm: " + date,
-                    Toast.LENGTH_SHORT).show();
-            finish();
-        });
+        binding.btnAdd.setOnClickListener(v ->
+                startActivity(new Intent(this, AddVaccineActivity.class)));
+
+        // Data mẫu
+        list.add(new HistoryAdapter.HistoryItem(
+                "Loại vaccine: DHLPPI", "Ngày tiêm: 23/6/2025"));
+
+        adapter = new HistoryAdapter(list,
+                (position, item) -> {
+                    // Nút Sửa → mở AddVaccineActivity
+                    Intent intent = new Intent(this, AddVaccineActivity.class);
+                    intent.putExtra("is_edit", true);
+                    intent.putExtra("position", position);
+                    intent.putExtra("vaccine_name", item.title);
+                    intent.putExtra("vaccine_date", item.date);
+                    startActivity(intent);
+                },
+                position -> {} // Xóa đã xử lý trong adapter
+        );
+
+        binding.rvVaccineList.setLayoutManager(new LinearLayoutManager(this));
+        binding.rvVaccineList.setAdapter(adapter);
     }
 }

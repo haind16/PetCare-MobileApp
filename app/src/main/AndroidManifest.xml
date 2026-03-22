@@ -52,6 +52,11 @@
         <activity android:name=".ui.pet.health.AllergyActivity"/>
         <activity android:name=".ui.pet.health.DiseaseActivity"/>
         <activity android:name=".ui.pet.health.PrescriptionActivity"/>
+        <activity android:name=".ui.pet.health.AddVaccineActivity"/>
+        <activity android:name=".ui.pet.health.AddDewormingActivity"/>
+        <activity android:name=".ui.pet.health.AddAllergyActivity"/>
+        <activity android:name=".ui.pet.health.AddDiseaseActivity"/>
+        <activity android:name=".ui.pet.health.AddPrescriptionActivity"/>
 
     </application>
 </manifest>
