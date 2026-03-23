@@ -9,6 +9,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
+import com.google.firebase.auth.FirebaseAuth;
 import com.nhom08.petcare.databinding.FragmentProfileBinding;
 import com.nhom08.petcare.ui.auth.LoginActivity;
 import com.nhom08.petcare.ui.pet.list.PetListActivity;
@@ -31,9 +33,10 @@ public class ProfileFragment extends Fragment {
                 startActivity(new Intent(getActivity(), ChangePasswordActivity.class)));
 
         binding.btnLogout.setOnClickListener(v -> {
-            Toast.makeText(getActivity(), "Đã đăng xuất!", Toast.LENGTH_SHORT).show();
+            FirebaseAuth.getInstance().signOut();
             Intent intent = new Intent(getActivity(), LoginActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+                    Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         });
 
