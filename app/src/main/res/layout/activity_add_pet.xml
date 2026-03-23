@@ -160,31 +160,46 @@
                 android:inputType="text"
                 android:textSize="14sp"/>
 
-            <!-- Nút chọn ảnh -->
             <LinearLayout
-                android:id="@+id/btnPickImage"
-                android:layout_width="wrap_content"
-                android:layout_height="48dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:background="@drawable/bg_icon_blue"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
                 android:layout_marginBottom="24dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🖼"
-                    android:textSize="18sp"/>
+                <!-- Preview ảnh -->
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/imgPetPreview"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:src="@drawable/pet_welcome"
+                    android:layout_marginBottom="12dp"/>
 
-                <TextView
+                <!-- Nút chọn ảnh -->
+                <LinearLayout
+                    android:id="@+id/btnPickImage"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:text="Ảnh"
-                    android:textSize="14sp"
-                    android:textColor="@color/primary_blue"/>
+                    android:layout_height="40dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_icon_blue"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_camera"
+                        android:tint="@color/primary_blue"
+                        android:layout_marginEnd="6dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Chọn ảnh"
+                        android:textSize="13sp"
+                        android:textColor="@color/primary_blue"/>
+                </LinearLayout>
             </LinearLayout>
 
         </LinearLayout>

@@ -5,9 +5,9 @@ import android.os.Bundle;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.nhom08.petcare.databinding.ActivityRegisterBinding;
-import com.nhom08.petcare.ui.main.MainActivity;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,7 +15,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     private ActivityRegisterBinding binding;
     private FirebaseAuth auth;
-    private FirebaseFirestore db;
+    private DatabaseReference db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,11 +24,11 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         auth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
+        db = FirebaseDatabase.getInstance(
+                "https://petcare-1ce14-default-rtdb.asia-southeast1.firebasedatabase.app"
+        ).getReference();
 
         binding.btnBack.setOnClickListener(v -> finish());
-
-        // btnSubmit → đăng ký
         binding.btnSubmit.setOnClickListener(v -> register());
     }
 
@@ -38,7 +38,6 @@ public class RegisterActivity extends AppCompatActivity {
         String username = binding.etUsername.getText().toString().trim();
         String password = binding.etPassword.getText().toString().trim();
 
-        // Validate
         if (fullName.isEmpty()) {
             binding.etFullName.setError("Vui lòng nhập họ tên");
             return;
@@ -62,10 +61,10 @@ public class RegisterActivity extends AppCompatActivity {
 
         binding.btnSubmit.setEnabled(false);
 
-        // Tạo tài khoản Firebase Auth
         auth.createUserWithEmailAndPassword(email, password)
                 .addOnSuccessListener(result -> {
                     String userId = result.getUser().getUid();
+                    android.util.Log.d("REGISTER", "Auth OK: " + userId);
 
                     Map<String, Object> user = new HashMap<>();
                     user.put("displayName", fullName);
@@ -74,17 +73,13 @@ public class RegisterActivity extends AppCompatActivity {
                     user.put("phone", "");
                     user.put("address", "");
 
-                    db.collection("users").document(userId)
-                            .set(user)
+                    db.child("users").child(userId).setValue(user)
                             .addOnSuccessListener(unused -> {
+                                android.util.Log.d("REGISTER", "DB OK!");
                                 Toast.makeText(this,
-                                        "Đăng ký thành công! Vui lòng đăng nhập.",
+                                        "Đăng ký thành công!",
                                         Toast.LENGTH_SHORT).show();
-
-                                // Đăng xuất sau khi tạo tài khoản
                                 FirebaseAuth.getInstance().signOut();
-
-                                // Về màn Login
                                 Intent intent = new Intent(this, LoginActivity.class);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
                                         Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -92,15 +87,16 @@ public class RegisterActivity extends AppCompatActivity {
                                 finish();
                             })
                             .addOnFailureListener(e -> {
-                                // Firestore lỗi nhưng Auth đã tạo → signOut + về Login
+                                android.util.Log.e("REGISTER", "DB Error: " + e.getMessage());
+                                binding.btnSubmit.setEnabled(true);
                                 FirebaseAuth.getInstance().signOut();
                                 Toast.makeText(this,
-                                        "Lưu thông tin thất bại: " + e.getMessage(),
+                                        "Lỗi DB: " + e.getMessage(),
                                         Toast.LENGTH_LONG).show();
-                                binding.btnSubmit.setEnabled(true);
                             });
                 })
                 .addOnFailureListener(e -> {
+                    android.util.Log.e("REGISTER", "Auth Error: " + e.getMessage());
                     binding.btnSubmit.setEnabled(true);
                     Toast.makeText(this,
                             "Đăng ký thất bại: " + e.getMessage(),
