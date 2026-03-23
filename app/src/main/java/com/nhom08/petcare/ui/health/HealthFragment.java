@@ -18,6 +18,7 @@ import com.nhom08.petcare.databinding.FragmentHealthBinding;
 import com.nhom08.petcare.ui.health.diary.DiaryActivity;
 import com.nhom08.petcare.ui.health.info.InfoListActivity;
 import com.nhom08.petcare.ui.health.medical.MedicalRecordActivity;
+import com.nhom08.petcare.ui.health.statistics.HealthStatisticsActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +37,10 @@ public class HealthFragment extends Fragment {
         setupChart();
 
         // Kết nối các nút
+        binding.tvViewAll.setOnClickListener(v ->
+                startActivity(new Intent(getActivity(),
+                        HealthStatisticsActivity.class)));
+
         binding.btnDiseaseLib.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), InfoListActivity.class);
             intent.putExtra("type", InfoListActivity.TYPE_DISEASE);
@@ -55,7 +60,8 @@ public class HealthFragment extends Fragment {
         });
 
         binding.btnMedicalRecord.setOnClickListener(v ->
-                startActivity(new Intent(getActivity(), MedicalRecordActivity.class)));
+                startActivity(new Intent(getActivity(),
+                        MedicalRecordActivity.class)));
 
         binding.btnDiary.setOnClickListener(v ->
                 startActivity(new Intent(getActivity(), DiaryActivity.class)));

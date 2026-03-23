@@ -11,6 +11,8 @@ import androidx.fragment.app.Fragment;
 import com.nhom08.petcare.databinding.FragmentHomeBinding;
 import com.nhom08.petcare.ui.health.reminder.AddReminderActivity;
 import com.nhom08.petcare.ui.interactive.InteractActivity;
+import com.nhom08.petcare.ui.pet.list.PetSelectorActivity;
+import com.nhom08.petcare.utils.PetManager;
 
 public class HomeFragment extends Fragment {
 
@@ -31,8 +33,24 @@ public class HomeFragment extends Fragment {
         binding.btnInteract.setOnClickListener(v ->
                 startActivity(new Intent(getActivity(), InteractActivity.class)));
 
+        // Nút Đổi thú cưng
+        binding.btnChangePet.setOnClickListener(v ->
+                startActivity(new Intent(getActivity(), PetSelectorActivity.class)));
+
         return binding.getRoot();
     }
+
+
+    // Cập nhật tên thú cưng khi quay về
+    @Override
+    public void onResume() {
+        super.onResume();
+        PetManager pm = PetManager.getInstance(requireContext());
+        if (pm.hasPet()) {
+            binding.tvPetName.setText(pm.getCurrentPetName());
+        }
+    }
+
 
     @Override
     public void onDestroyView() {

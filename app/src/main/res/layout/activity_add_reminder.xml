@@ -67,13 +67,18 @@
                 android:orientation="vertical"
                 android:gravity="center">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="64dp"
                     android:layout_height="64dp"
                     android:background="@drawable/bg_icon_blue"
-                    android:gravity="center"
-                    android:text="🍽"
-                    android:textSize="28sp"/>
+                    android:gravity="center">
+
+                    <ImageView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:src="@drawable/ic_food"
+                        app:tint="#1565C0"/>
+                </LinearLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -93,13 +98,18 @@
                 android:orientation="vertical"
                 android:gravity="center">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="64dp"
                     android:layout_height="64dp"
                     android:background="@drawable/bg_icon_pink"
-                    android:gravity="center"
-                    android:text="🦮"
-                    android:textSize="28sp"/>
+                    android:gravity="center">
+
+                    <ImageView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:src="@drawable/ic_walk"
+                        app:tint="#AD1457"/>
+                </LinearLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -119,13 +129,18 @@
                 android:orientation="vertical"
                 android:gravity="center">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="64dp"
                     android:layout_height="64dp"
                     android:background="@drawable/bg_icon_yellow"
-                    android:gravity="center"
-                    android:text="💊"
-                    android:textSize="28sp"/>
+                    android:gravity="center">
+
+                    <ImageView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:src="@drawable/ic_pill"
+                        app:tint="#E65100"/>
+                </LinearLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -153,13 +168,18 @@
                 android:orientation="vertical"
                 android:gravity="center">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="64dp"
                     android:layout_height="64dp"
                     android:background="@drawable/bg_icon_blue"
-                    android:gravity="center"
-                    android:text="✂️"
-                    android:textSize="28sp"/>
+                    android:gravity="center">
+
+                    <ImageView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:src="@drawable/ic_brush"
+                        app:tint="#1565C0"/>
+                </LinearLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -179,13 +199,18 @@
                 android:orientation="vertical"
                 android:gravity="center">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="64dp"
                     android:layout_height="64dp"
                     android:background="@drawable/bg_icon_yellow"
-                    android:gravity="center"
-                    android:text="···"
-                    android:textSize="20sp"/>
+                    android:gravity="center">
+
+                    <ImageView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:src="@drawable/ic_more"
+                        app:tint="#E65100"/>
+                </LinearLayout>
 
                 <TextView
                     android:layout_width="wrap_content"

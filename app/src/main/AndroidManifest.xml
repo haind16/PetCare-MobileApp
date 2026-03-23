@@ -67,6 +67,11 @@
         <activity android:name=".ui.health.info.InfoDetailActivity"/>
         <activity android:name=".ui.health.diary.AddDiaryActivity"/>
         <activity android:name=".ui.health.diary.DiaryDetailActivity"/>
+        <activity android:name=".ui.health.statistics.HealthStatisticsActivity"/>
+        <activity android:name=".ui.pet.list.PetSelectorActivity"/>
+        <activity android:name=".ui.health.medical.MedicalRecordActivity"/>
+        <activity android:name=".ui.health.medical.MedicalRecordDetailActivity"/>
+        <activity android:name=".ui.health.medical.AddMedicalRecordActivity"/>
 
     </application>
 </manifest>
