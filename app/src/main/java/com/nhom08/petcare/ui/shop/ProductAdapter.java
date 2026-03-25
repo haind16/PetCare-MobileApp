@@ -4,21 +4,43 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.nhom08.petcare.R;
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 
 public class ProductAdapter extends
         RecyclerView.Adapter<ProductAdapter.ProductViewHolder> {
 
+    // ----------------------------------------------------------------
+    // Model — ánh xạ 1-1 với Firebase products node
+    // ----------------------------------------------------------------
     public static class ProductItem {
-        public String name, sold, price;
-        public ProductItem(String name, String sold, String price) {
-            this.name = name;
-            this.sold = sold;
-            this.price = price;
+        public String id;       // key Firebase (product_1, ...)
+        public String name;     // ten
+        public String danhMuc;  // danhMuc
+        public String moTa;     // moTa
+        public long   daBan;    // daBan
+        public long   gia;      // gia (số nguyên, đơn vị VNĐ)
+
+        public ProductItem(String id, String name, String danhMuc,
+                           String moTa, long daBan, long gia) {
+            this.id      = id;
+            this.name    = name;
+            this.danhMuc = danhMuc;
+            this.moTa    = moTa;
+            this.daBan   = daBan;
+            this.gia     = gia;
+        }
+
+        /** Trả về giá đã format, ví dụ: "120,000đ" */
+        public String getGiaFormatted() {
+            return NumberFormat.getNumberInstance(Locale.US)
+                    .format(gia).replace(",", ".") + "đ";
         }
     }
 
@@ -26,31 +48,30 @@ public class ProductAdapter extends
         void onAddToCart(ProductItem item);
     }
 
-    private List<ProductItem> list;
-    private OnAddToCartListener listener;
+    private final List<ProductItem>   list;
+    private final OnAddToCartListener listener;
 
-    public ProductAdapter(List<ProductItem> list,
-                          OnAddToCartListener listener) {
-        this.list = list;
+    public ProductAdapter(List<ProductItem> list, OnAddToCartListener listener) {
+        this.list     = list;
         this.listener = listener;
     }
 
     @NonNull
     @Override
-    public ProductViewHolder onCreateViewHolder(@NonNull ViewGroup parent,
-                                                int viewType) {
+    public ProductViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_product, parent, false);
         return new ProductViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ProductViewHolder holder,
-                                 int position) {
+    public void onBindViewHolder(@NonNull ProductViewHolder holder, int position) {
         ProductItem item = list.get(position);
+
         holder.tvProductName.setText(item.name);
-        holder.tvProductId.setText("Đã bán: " + item.sold);
-        holder.tvPrice.setText(item.price);
+        holder.tvProductId.setText("Đã bán: " + item.daBan);
+        holder.tvPrice.setText(item.getGiaFormatted());
+
         holder.btnAddToCart.setOnClickListener(v -> {
             if (listener != null) listener.onAddToCart(item);
         });
@@ -59,16 +80,21 @@ public class ProductAdapter extends
     @Override
     public int getItemCount() { return list.size(); }
 
+    // ----------------------------------------------------------------
+    // ViewHolder — ID khớp với item_product.xml
+    // ----------------------------------------------------------------
     static class ProductViewHolder extends RecyclerView.ViewHolder {
-        TextView tvProductName, tvProductId, tvPrice;
-        Button btnAddToCart;
+        TextView  tvProductName, tvProductId, tvPrice;
+        Button    btnAddToCart;
+        ImageView imgProduct; // ảnh placeholder, dùng khi có anhUrl
 
         ProductViewHolder(View itemView) {
             super(itemView);
             tvProductName = itemView.findViewById(R.id.tvProductName);
-            tvProductId = itemView.findViewById(R.id.tvProductId);
-            tvPrice = itemView.findViewById(R.id.tvPrice);
-            btnAddToCart = itemView.findViewById(R.id.btnAddToCart);
+            tvProductId   = itemView.findViewById(R.id.tvProductId);
+            tvPrice       = itemView.findViewById(R.id.tvPrice);
+            btnAddToCart  = itemView.findViewById(R.id.btnAddToCart);
+            imgProduct    = itemView.findViewById(R.id.imgProduct);
         }
     }
 }

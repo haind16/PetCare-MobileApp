@@ -4,7 +4,11 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+import com.nhom08.petcare.R; // Đừng quên import R
 import com.nhom08.petcare.databinding.ActivityInfoDetailBinding;
 
 public class InfoDetailActivity extends AppCompatActivity {
@@ -19,114 +23,160 @@ public class InfoDetailActivity extends AppCompatActivity {
 
         binding.btnBack.setOnClickListener(v -> finish());
 
-        String type = getIntent().getStringExtra("type");
-        String name = getIntent().getStringExtra("name");
-        String tag  = getIntent().getStringExtra("tag");
+        // Nhận data từ InfoListActivity
+        String type   = getIntent().getStringExtra("type");
+        String name   = getIntent().getStringExtra("name");
+        String field1 = getIntent().getStringExtra("field1");
+        String field2 = getIntent().getStringExtra("field2");
+        String field3 = getIntent().getStringExtra("field3");
+        String field4 = getIntent().getStringExtra("field4");
 
-        binding.tvName.setText(name);
+        binding.tvName.setText(name != null ? name : "");
 
         if (InfoListActivity.TYPE_DISEASE.equals(type)) {
-            binding.tvTitle.setText("Chi tiết bệnh");
-            binding.tvContent.setText(getDiseaseContent(name));
-            binding.btnAction.setVisibility(View.VISIBLE);
-            binding.btnAction.setText("Liên hệ thú y ngay");
-            binding.btnAction.setOnClickListener(v -> {
-                Intent intent = new Intent(this, InfoListActivity.class);
-                intent.putExtra("type", InfoListActivity.TYPE_VET);
-                startActivity(intent);
-            });
+            setupDisease(name, field1, field2, field3, field4);
 
         } else if (InfoListActivity.TYPE_NUTRITION.equals(type)) {
-            binding.tvTitle.setText("Chi tiết dinh dưỡng");
-            binding.tvContent.setText(getNutritionContent(name));
+            setupNutrition(name, field1, field2, field3, field4);
 
-            // Hiện nút → sang Shop
-            binding.btnAction.setVisibility(View.VISIBLE);
-            binding.btnAction.setText("Xem sản phẩm tại Shop");
-            binding.btnAction.setOnClickListener(v -> {
-                Intent intent = new Intent(this,
-                        com.nhom08.petcare.ui.main.MainActivity.class);
-                intent.putExtra("nav_to", "shop");
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
-                        Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                startActivity(intent);
-                finish();
-            });
         } else if (InfoListActivity.TYPE_VET.equals(type)) {
-            binding.tvTitle.setText("Chi tiết phòng khám");
-            binding.tvContent.setText(getVetContent(name));
-            binding.btnAction.setVisibility(View.VISIBLE);
-            binding.btnAction.setText("Liên hệ ngay");
-            // Gọi điện — số điện thoại lấy theo tên phòng khám
-            binding.btnAction.setOnClickListener(v -> {
-                String phone = getPhoneByName(name);
-                startActivity(new Intent(Intent.ACTION_DIAL,
-                        Uri.parse("tel:" + phone)));
-            });
+            setupVet(name, field1, field2, field3, field4);
         }
     }
 
-    private String getDiseaseContent(String name) {
-        return "Mô tả\n" +
-                name + " là tình trạng thường gặp ở thú cưng.\n\n" +
-                "Triệu chứng\n" +
-                "• Triệu chứng 1\n• Triệu chứng 2\n• Triệu chứng 3\n\n" +
-                "Nguyên nhân\n" +
-                "• Nguyên nhân 1\n• Nguyên nhân 2\n\n" +
-                "Cách xử lý tại nhà\n" +
-                "• Bước 1\n• Bước 2\n• Bước 3\n\n" +
-                "Cần đến thú y khi\n" +
-                "• Triệu chứng nặng hơn\n• Mất nước nghiêm trọng";
+    // ----------------------------------------------------------------
+    // Hàm Helper để set icon và nội dung cho từng khối dễ dàng
+    // ----------------------------------------------------------------
+    private void setupSection(LinearLayout layout, ImageView iv, TextView tvTitle, TextView tvContent,
+                              int iconResId, String title, String content, boolean isBullet) {
+        if (content == null || content.trim().isEmpty()) {
+            layout.setVisibility(View.GONE); // Ẩn nếu không có dữ liệu
+            return;
+        }
+
+        layout.setVisibility(View.VISIBLE);
+        iv.setImageResource(iconResId);
+        tvTitle.setText(title);
+
+        if (isBullet) {
+            tvContent.setText(formatBullets(content));
+        } else {
+            tvContent.setText(content);
+        }
     }
 
-    private String getNutritionContent(String name) {
-        return "Mô tả\n" +
-                name + " được thiết kế đặc biệt cho thú cưng.\n\n" +
-                "Phù hợp với\n" +
-                "• Độ tuổi phù hợp\n• Giống thú cưng\n\n" +
-                "Lợi ích\n" +
-                "• Lợi ích 1\n• Lợi ích 2\n• Lợi ích 3\n\n" +
-                "Gợi ý thực phẩm\n" +
-                "• Thực phẩm 1\n• Thực phẩm 2\n\n" +
-                "Lưu ý\n" +
-                "• Lưu ý 1\n• Lưu ý 2";
+    // ----------------------------------------------------------------
+    // Bệnh lý
+    // ----------------------------------------------------------------
+    private void setupDisease(String name, String trieuChung, String nguyenNhan, String huongChamSoc, String mucDo) {
+        binding.tvTitle.setText("Chi tiết bệnh");
+
+        // Set các khối (Đổi tên R.drawable.ic_... thành tên file thật của bạn)
+        setupSection(binding.layoutSection1, binding.ivIcon1, binding.tvTitle1, binding.tvContent1,
+                R.drawable.ic_warning, "Mức độ nguy hiểm", mucDo, false);
+
+        setupSection(binding.layoutSection2, binding.ivIcon2, binding.tvTitle2, binding.tvContent2,
+                R.drawable.ic_medical, "Triệu chứng", trieuChung, true);
+
+        setupSection(binding.layoutSection3, binding.ivIcon3, binding.tvTitle3, binding.tvContent3,
+                R.drawable.ic_danger, "Nguyên nhân", nguyenNhan, true);
+
+        setupSection(binding.layoutSection4, binding.ivIcon4, binding.tvTitle4, binding.tvContent4,
+                R.drawable.ic_pill, "Hướng chăm sóc tại nhà", huongChamSoc, true);
+
+        // Khối 5: Lưu ý
+        String luuYText = "Nếu triệu chứng kéo dài hoặc nặng hơn, hãy đưa thú cưng đến phòng khám thú y ngay.";
+        setupSection(binding.layoutSection5, binding.ivIcon5, binding.tvTitle5, binding.tvContent5,
+                R.drawable.ic_note, "Lưu ý", luuYText, true);
+
+        // Nút hành động
+        binding.btnAction.setVisibility(View.VISIBLE);
+        binding.btnAction.setText("Liên hệ thú y ngay");
+        binding.btnAction.setOnClickListener(v -> {
+            // Logic chuyển trang
+        });
     }
 
-    private String getVetContent(String name) {
-        return "Địa chỉ\n" + getAddressByName(name) + "\n\n" +
-                "Giờ mở cửa\n" + getHoursByName(name) + "\n\n" +
-                "Số điện thoại\n" + getPhoneByName(name) + "\n\n" +
-                "Đánh giá\n" + getRatingByName(name) + "\n\n" +
-                "Dịch vụ chính\n" +
-                "• Khám tổng quát\n" +
-                "• Tiêm phòng\n" +
-                "• Phẫu thuật\n" +
-                "• Xét nghiệm máu\n" +
-                "• Siêu âm\n" +
-                "• Nội trú điều trị\n" +
-                "• Grooming cơ bản";
+    // ----------------------------------------------------------------
+    // Dinh dưỡng
+    // ----------------------------------------------------------------
+    private void setupNutrition(String name, String nenAn, String khongNenAn, String luuY, String doTuoi) {
+        binding.tvTitle.setText("Chi tiết dinh dưỡng");
+
+        setupSection(binding.layoutSection1, binding.ivIcon1, binding.tvTitle1, binding.tvContent1,
+                R.drawable.ic_walk, "Đối tượng", doTuoi, false);
+
+        setupSection(binding.layoutSection2, binding.ivIcon2, binding.tvTitle2, binding.tvContent2,
+                R.drawable.ic_check, "Thực phẩm nên ăn", nenAn, true);
+
+        setupSection(binding.layoutSection3, binding.ivIcon3, binding.tvTitle3, binding.tvContent3,
+                R.drawable.ic_cancel, "Thực phẩm không nên ăn", khongNenAn, true);
+
+        setupSection(binding.layoutSection4, binding.ivIcon4, binding.tvTitle4, binding.tvContent4,
+                R.drawable.ic_clipboard, "Lưu ý khẩu phần", luuY, true);
+
+        // Ẩn khối 5 vì dinh dưỡng chỉ có 4 mục
+        binding.layoutSection5.setVisibility(View.GONE);
+
+        // Nút hành động
+        binding.btnAction.setVisibility(View.VISIBLE);
+        binding.btnAction.setText("Xem sản phẩm tại Shop");
+        binding.btnAction.setOnClickListener(v -> {
+            // Logic chuyển trang
+        });
     }
 
-    private String getPhoneByName(String name) {
-        if (name.contains("PetHealth")) return "0762229882";
-        if (name.contains("Happy"))    return "0912345678";
-        return "0987654321";
+    // ----------------------------------------------------------------
+    // Phòng khám
+    // ----------------------------------------------------------------
+    private void setupVet(String name, String diaChi, String soDienThoai, String gioMoCua, String danhGia) {
+        binding.tvTitle.setText("Chi tiết phòng khám");
+
+        setupSection(binding.layoutSection1, binding.ivIcon1, binding.tvTitle1, binding.tvContent1,
+                R.drawable.ic_location, "Địa chỉ", diaChi, false);
+
+        setupSection(binding.layoutSection2, binding.ivIcon2, binding.tvTitle2, binding.tvContent2,
+                R.drawable.ic_clock, "Giờ mở cửa", gioMoCua, false);
+
+        setupSection(binding.layoutSection3, binding.ivIcon3, binding.tvTitle3, binding.tvContent3,
+                R.drawable.ic_phone, "Số điện thoại", soDienThoai, false);
+
+        setupSection(binding.layoutSection4, binding.ivIcon4, binding.tvTitle4, binding.tvContent4,
+                R.drawable.ic_star, "Đánh giá", danhGia, false);
+
+        // Khối 5: Dịch vụ chính
+        String dichVu = "Khám tổng quát, Tiêm phòng, Tẩy giun định kỳ, Phẫu thuật, Xét nghiệm máu, Siêu âm, Nội trú điều trị, Grooming cơ bản";
+        setupSection(binding.layoutSection5, binding.ivIcon5, binding.tvTitle5, binding.tvContent5,
+                R.drawable.ic_hospital, "Dịch vụ chính", dichVu, true);
+
+        // Nút hành động
+        binding.btnAction.setVisibility(View.VISIBLE);
+        binding.btnAction.setText("Gọi ngay: " + safe(soDienThoai));
+        binding.btnAction.setOnClickListener(v -> {
+            if (soDienThoai != null && !soDienThoai.isEmpty()) {
+                startActivity(new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + soDienThoai)));
+            }
+        });
     }
 
-    private String getAddressByName(String name) {
-        if (name.contains("PetHealth")) return "240 Âu Cơ, Quảng An, Tây Hồ, Hà Nội";
-        if (name.contains("Happy"))    return "47 Quảng Khánh, Tây Hồ, Hà Nội";
-        return "20 ngõ 424 Thụy Khuê, Tây Hồ, Hà Nội";
+    // ----------------------------------------------------------------
+    // Helper: format chuỗi thành dạng bullet list (trả về String)
+    // ----------------------------------------------------------------
+    private String formatBullets(String text) {
+        if (text == null || text.trim().isEmpty()) return "• Không có thông tin";
+
+        StringBuilder sb = new StringBuilder();
+        String[] parts = text.split("[,;،]");
+        for (String part : parts) {
+            String trimmed = part.trim();
+            if (!trimmed.isEmpty()) {
+                sb.append("• ").append(trimmed).append("\n");
+            }
+        }
+        return sb.toString().trim(); // Cắt bỏ dấu \n thừa ở cuối
     }
 
-    private String getHoursByName(String name) {
-        if (name.contains("Happy")) return "08:00 - 18:00";
-        return "07:30 - 20:30";
-    }
-
-    private String getRatingByName(String name) {
-        if (name.contains("PetHealth")) return "4.4 (123 đánh giá)";
-        if (name.contains("Happy"))    return "4.2 (78 đánh giá)";
-        return "4.3 (109 đánh giá)";
+    private String safe(String s) {
+        return s != null ? s : "Không có thông tin";
     }
 }

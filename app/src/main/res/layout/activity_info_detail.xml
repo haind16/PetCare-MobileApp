@@ -5,7 +5,6 @@
     android:orientation="vertical"
     android:background="@color/white">
 
-    <!-- Header -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="56dp"
@@ -29,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="Chi tiết bệnh"
+            android:text="Chi tiết"
             android:textColor="@color/white"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -46,7 +45,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Ảnh -->
             <ImageView
                 android:id="@+id/imgDetail"
                 android:layout_width="match_parent"
@@ -60,29 +58,59 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <!-- Tên -->
                 <TextView
                     android:id="@+id/tvName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Viêm đường ruột"
+                    android:text="Tên chi tiết"
                     android:textSize="20sp"
                     android:textStyle="bold"
                     android:layout_marginBottom="16dp"/>
 
-                <!-- Nội dung động -->
-                <TextView
-                    android:id="@+id/tvContent"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="14sp"
-                    android:lineSpacingExtra="4dp"/>
+                <LinearLayout android:id="@+id/layoutSection1" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginBottom="12dp">
+                    <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+                        <ImageView android:id="@+id/ivIcon1" android:layout_width="20dp" android:layout_height="20dp" android:layout_marginEnd="8dp"/>
+                        <TextView android:id="@+id/tvTitle1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textStyle="bold" android:textSize="16sp" android:textColor="@android:color/black"/>
+                    </LinearLayout>
+                    <TextView android:id="@+id/tvContent1" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:textSize="14sp" android:lineSpacingExtra="4dp"/>
+                </LinearLayout>
+
+                <LinearLayout android:id="@+id/layoutSection2" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginBottom="12dp">
+                    <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+                        <ImageView android:id="@+id/ivIcon2" android:layout_width="20dp" android:layout_height="20dp" android:layout_marginEnd="8dp"/>
+                        <TextView android:id="@+id/tvTitle2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textStyle="bold" android:textSize="16sp" android:textColor="@android:color/black"/>
+                    </LinearLayout>
+                    <TextView android:id="@+id/tvContent2" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:textSize="14sp" android:lineSpacingExtra="4dp"/>
+                </LinearLayout>
+
+                <LinearLayout android:id="@+id/layoutSection3" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginBottom="12dp">
+                    <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+                        <ImageView android:id="@+id/ivIcon3" android:layout_width="20dp" android:layout_height="20dp" android:layout_marginEnd="8dp"/>
+                        <TextView android:id="@+id/tvTitle3" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textStyle="bold" android:textSize="16sp" android:textColor="@android:color/black"/>
+                    </LinearLayout>
+                    <TextView android:id="@+id/tvContent3" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:textSize="14sp" android:lineSpacingExtra="4dp"/>
+                </LinearLayout>
+
+                <LinearLayout android:id="@+id/layoutSection4" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginBottom="12dp">
+                    <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+                        <ImageView android:id="@+id/ivIcon4" android:layout_width="20dp" android:layout_height="20dp" android:layout_marginEnd="8dp"/>
+                        <TextView android:id="@+id/tvTitle4" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textStyle="bold" android:textSize="16sp" android:textColor="@android:color/black"/>
+                    </LinearLayout>
+                    <TextView android:id="@+id/tvContent4" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:textSize="14sp" android:lineSpacingExtra="4dp"/>
+                </LinearLayout>
+
+                <LinearLayout android:id="@+id/layoutSection5" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginBottom="12dp" android:visibility="gone">
+                    <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+                        <ImageView android:id="@+id/ivIcon5" android:layout_width="20dp" android:layout_height="20dp" android:layout_marginEnd="8dp"/>
+                        <TextView android:id="@+id/tvTitle5" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textStyle="bold" android:textSize="16sp" android:textColor="@android:color/black"/>
+                    </LinearLayout>
+                    <TextView android:id="@+id/tvContent5" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:textSize="14sp" android:lineSpacingExtra="4dp"/>
+                </LinearLayout>
 
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
 
-    <!-- Nút hành động — ẩn/hiện tùy loại -->
     <Button
         android:id="@+id/btnAction"
         android:layout_width="match_parent"
