@@ -10,45 +10,53 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import com.google.firebase.database.*;
 import com.nhom08.petcare.R;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 public class LikesFragment extends Fragment {
+    private List<String> names = new ArrayList<>();
+    private RecyclerView.Adapter adapter;
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
-        RecyclerView rv = new RecyclerView(requireContext());
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_likes, container, false);
+        RecyclerView rv = view.findViewById(R.id.rvLikes);
+
         rv.setLayoutManager(new LinearLayoutManager(requireContext()));
+        rv.setHasFixedSize(true);
+        rv.setNestedScrollingEnabled(true);
 
-        List<String> names = Arrays.asList(
-                "Hà My", "Hải Nam", "Hương Giang",
-                "Nguyễn Kiên", "Ngọc Linh", "Tuấn Tài");
+        String postId = getArguments() != null ? getArguments().getString("postId") : "post1";
+        DatabaseReference likesRef = FirebaseDatabase.getInstance("https://petcare-1ce14-default-rtdb.asia-southeast1.firebasedatabase.app")
+                .getReference("posts").child(postId).child("userLikes");
 
-        rv.setAdapter(new RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-            @NonNull
-            @Override
-            public RecyclerView.ViewHolder onCreateViewHolder(
-                    @NonNull ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.item_like, parent, false);
-                return new RecyclerView.ViewHolder(view) {};
+        adapter = new RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+            @NonNull @Override public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup p, int t) {
+                return new RecyclerView.ViewHolder(LayoutInflater.from(p.getContext()).inflate(R.layout.item_like, p, false)) {};
             }
-
-            @Override
-            public void onBindViewHolder(
-                    @NonNull RecyclerView.ViewHolder holder, int position) {
-                TextView tvName = holder.itemView.findViewById(R.id.tvUserName);
-                tvName.setText(names.get(position));
+            @Override public void onBindViewHolder(@NonNull RecyclerView.ViewHolder h, int p) {
+                ((TextView)h.itemView.findViewById(R.id.tvUserName)).setText(names.get(p));
             }
+            @Override public int getItemCount() { return names.size(); }
+        };
+        rv.setAdapter(adapter);
 
+        likesRef.addValueEventListener(new ValueEventListener() {
             @Override
-            public int getItemCount() { return names.size(); }
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                names.clear();
+                for (DataSnapshot d : snapshot.getChildren()) {
+                    String n = d.getValue(String.class); // Lấy tên thật đã lưu
+                    if (n != null) names.add(n);
+                }
+                adapter.notifyDataSetChanged();
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
         });
-
-        return rv;
+        return view;
     }
 }
