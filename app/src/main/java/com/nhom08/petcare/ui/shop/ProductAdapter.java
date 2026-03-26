@@ -8,6 +8,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide; // Nhớ import thư viện Glide
 import com.nhom08.petcare.R;
 import java.text.NumberFormat;
 import java.util.List;
@@ -26,18 +28,20 @@ public class ProductAdapter extends
         public String moTa;     // moTa
         public long   daBan;    // daBan
         public long   gia;      // gia (số nguyên, đơn vị VNĐ)
+        public String anhUrl;   // Thêm trường chứa link ảnh
 
         public ProductItem(String id, String name, String danhMuc,
-                           String moTa, long daBan, long gia) {
+                           String moTa, long daBan, long gia, String anhUrl) {
             this.id      = id;
             this.name    = name;
             this.danhMuc = danhMuc;
             this.moTa    = moTa;
             this.daBan   = daBan;
             this.gia     = gia;
+            this.anhUrl  = anhUrl;
         }
 
-        /** Trả về giá đã format, ví dụ: "120,000đ" */
+        /** Trả về giá đã format, ví dụ: "120.000đ" */
         public String getGiaFormatted() {
             return NumberFormat.getNumberInstance(Locale.US)
                     .format(gia).replace(",", ".") + "đ";
@@ -72,6 +76,13 @@ public class ProductAdapter extends
         holder.tvProductId.setText("Đã bán: " + item.daBan);
         holder.tvPrice.setText(item.getGiaFormatted());
 
+        // Sử dụng Glide để tải ảnh
+        Glide.with(holder.itemView.getContext())
+                .load(item.anhUrl)
+                .placeholder(R.drawable.pet_welcome) // Ảnh chờ tải
+                .error(R.drawable.pet_welcome)       // Ảnh nếu lỗi hoặc không có URL
+                .into(holder.imgProduct);
+
         holder.btnAddToCart.setOnClickListener(v -> {
             if (listener != null) listener.onAddToCart(item);
         });
@@ -86,7 +97,7 @@ public class ProductAdapter extends
     static class ProductViewHolder extends RecyclerView.ViewHolder {
         TextView  tvProductName, tvProductId, tvPrice;
         Button    btnAddToCart;
-        ImageView imgProduct; // ảnh placeholder, dùng khi có anhUrl
+        ImageView imgProduct;
 
         ProductViewHolder(View itemView) {
             super(itemView);

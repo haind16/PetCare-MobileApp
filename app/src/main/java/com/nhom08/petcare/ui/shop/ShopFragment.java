@@ -30,7 +30,6 @@ public class ShopFragment extends Fragment {
     private FragmentShopBinding binding;
     private ProductAdapter adapter;
 
-    // ← FIX: lưu ref + listener để remove khi Fragment destroy
     private DatabaseReference  productRef;
     private ValueEventListener productListener;
 
@@ -74,7 +73,6 @@ public class ShopFragment extends Fragment {
         } else {
             currentCategory = category;
         }
-        // ← FIX: kiểm tra binding trước khi dùng
         if (binding != null) {
             applyFilter(binding.etSearch.getText().toString().trim());
         }
@@ -109,11 +107,9 @@ public class ShopFragment extends Fragment {
                 .getInstance(DB_URL)
                 .getReference("products");
 
-        // ← FIX: lưu vào biến productListener thay vì new anonymous trực tiếp
         productListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                // ← FIX: thoát ngay nếu Fragment đã bị destroy (binding = null)
                 if (binding == null) return;
 
                 allProducts.clear();
@@ -124,6 +120,7 @@ public class ShopFragment extends Fragment {
                     String moTa    = child.child("moTa").getValue(String.class);
                     Long   giaLong = child.child("gia").getValue(Long.class);
                     Long   daBanL  = child.child("daBan").getValue(Long.class);
+                    String anhUrl  = child.child("anhUrl").getValue(String.class); // Thêm lấy URL ảnh
 
                     if (ten == null) continue;
 
@@ -136,7 +133,8 @@ public class ShopFragment extends Fragment {
                             danhMuc != null ? danhMuc : "",
                             moTa    != null ? moTa    : "",
                             daBan,
-                            gia
+                            gia,
+                            anhUrl  != null ? anhUrl  : "" // Truyền url ảnh vào constructor
                     ));
                 }
                 applyFilter(binding.etSearch.getText().toString().trim());
@@ -144,7 +142,6 @@ public class ShopFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                // ← FIX: thoát ngay nếu Fragment đã bị destroy
                 if (binding == null) return;
                 if (getActivity() != null) {
                     Toast.makeText(getActivity(),
@@ -183,6 +180,7 @@ public class ShopFragment extends Fragment {
             cartItem.put("ten",     item.name);
             cartItem.put("gia",     item.gia);
             cartItem.put("danhMuc", item.danhMuc);
+            cartItem.put("anhUrl",  item.anhUrl); // Lưu cả ảnh vào giỏ hàng để sau này dùng
             cartItem.put("soLuong", currentQty + 1);
 
             cartRef.setValue(cartItem).addOnSuccessListener(unused -> {
@@ -198,7 +196,6 @@ public class ShopFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        // ← FIX: remove listener TRƯỚC KHI binding = null → tránh crash NPE
         if (productRef != null && productListener != null) {
             productRef.removeEventListener(productListener);
         }

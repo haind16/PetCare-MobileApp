@@ -111,13 +111,20 @@ public class CartActivity extends AppCompatActivity {
                     Long   giaLong   = child.child("gia").getValue(Long.class);
                     Long   soLuongL  = child.child("soLuong").getValue(Long.class);
 
+                    // Lấy link ảnh từ dữ liệu giỏ hàng trên Firebase
+                    String anhUrl    = child.child("anhUrl").getValue(String.class);
+
                     if (ten == null) continue;
 
                     long gia      = giaLong   != null ? giaLong   : 0;
                     int  soLuong  = soLuongL  != null ? soLuongL.intValue() : 1;
 
+                    // Gán giá trị mặc định là chuỗi rỗng nếu không có ảnh
+                    String safeAnhUrl = anhUrl != null ? anhUrl : "";
+
+                    // Cập nhật constructor để truyền thêm safeAnhUrl
                     cartItems.add(new CartAdapter.CartItem(
-                            productId, ten, gia, soLuong));
+                            productId, ten, gia, soLuong, safeAnhUrl));
                 }
                 adapter.notifyDataSetChanged();
                 updateTotal();

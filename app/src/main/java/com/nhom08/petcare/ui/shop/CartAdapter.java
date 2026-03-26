@@ -7,6 +7,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide; // Nhớ import thư viện Glide
 import com.nhom08.petcare.R;
 import java.text.NumberFormat;
 import java.util.List;
@@ -23,12 +25,14 @@ public class CartAdapter extends
         public String name;      // ten
         public long   gia;       // gia
         public int    quantity;  // soLuong
+        public String anhUrl;    // Thêm trường anhUrl
 
-        public CartItem(String productId, String name, long gia, int quantity) {
+        public CartItem(String productId, String name, long gia, int quantity, String anhUrl) {
             this.productId = productId;
             this.name      = name;
             this.gia       = gia;
             this.quantity  = quantity;
+            this.anhUrl    = anhUrl; // Khởi tạo anhUrl
         }
 
         /** Trả về giá 1 đơn vị đã format, ví dụ: "120.000đ" */
@@ -70,6 +74,13 @@ public class CartAdapter extends
         holder.tvPrice.setText(item.getGiaFormatted());
         holder.tvQuantity.setText(String.valueOf(item.quantity));
 
+        // Sử dụng Glide để tải ảnh sản phẩm trong giỏ hàng
+        Glide.with(holder.itemView.getContext())
+                .load(item.anhUrl)
+                .placeholder(R.drawable.pet_welcome) // Ảnh mặc định trong lúc chờ tải
+                .error(R.drawable.pet_welcome)       // Ảnh mặc định nếu lỗi hoặc anhUrl rỗng
+                .into(holder.imgProduct);
+
         // Nút tăng số lượng
         holder.btnPlus.setOnClickListener(v -> {
             item.quantity++;
@@ -105,6 +116,7 @@ public class CartAdapter extends
         TextView  tvProductName, tvPrice, tvQuantity;
         TextView  btnPlus, btnMinus;
         ImageView btnDelete;
+        ImageView imgProduct; // Thêm ImageView cho ảnh sản phẩm
 
         CartViewHolder(View itemView) {
             super(itemView);
@@ -114,6 +126,9 @@ public class CartAdapter extends
             btnPlus       = itemView.findViewById(R.id.btnPlus);
             btnMinus      = itemView.findViewById(R.id.btnMinus);
             btnDelete     = itemView.findViewById(R.id.btnDelete);
+
+            // Đảm bảo ID này khớp với ImageView ảnh sản phẩm trong file item_cart.xml của bạn
+            imgProduct    = itemView.findViewById(R.id.imgProduct);
         }
     }
 }

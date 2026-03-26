@@ -5,12 +5,15 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide; // Cần import thư viện Glide
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -19,6 +22,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.nhom08.petcare.R;
 import com.nhom08.petcare.databinding.ActivityCheckoutBinding;
+
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -49,7 +53,7 @@ public class CheckoutActivity extends AppCompatActivity {
         setupOrderItemsRecyclerView();
         setupPaymentOptions();
         loadCartAndUpdateUI();
-        loadCustomerInfo();         // ← load thông tin khách hàng từ Firebase
+        loadCustomerInfo();
 
         binding.tvShipping.setText(formatVnd(PHI_SHIP));
         binding.btnConfirm.setOnClickListener(v -> handleConfirm());
@@ -58,12 +62,11 @@ public class CheckoutActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Bật lại nút khi quay về từ QR/Bank
         binding.btnConfirm.setEnabled(true);
     }
 
     // ----------------------------------------------------------------
-    // Load thông tin khách hàng từ Firebase → hiển thị lên màn hình
+    // Load thông tin khách hàng từ Firebase
     // ----------------------------------------------------------------
     private void loadCustomerInfo() {
         String userId = getCurrentUserId();
@@ -106,7 +109,7 @@ public class CheckoutActivity extends AppCompatActivity {
     }
 
     // ----------------------------------------------------------------
-    // Load giỏ hàng từ Firebase → hiển thị + tính tổng tiền
+    // Load giỏ hàng từ Firebase
     // ----------------------------------------------------------------
     private void loadCartAndUpdateUI() {
         String userId = getCurrentUserId();
@@ -126,13 +129,15 @@ public class CheckoutActivity extends AppCompatActivity {
                             String ten       = child.child("ten").getValue(String.class);
                             Long   giaLong   = child.child("gia").getValue(Long.class);
                             Long   soLuongL  = child.child("soLuong").getValue(Long.class);
+                            String anhUrl    = child.child("anhUrl").getValue(String.class);
 
                             if (ten == null) continue;
 
                             long gia     = giaLong  != null ? giaLong  : 0;
                             int  soLuong = soLuongL != null ? soLuongL.intValue() : 1;
+                            String safeAnhUrl = anhUrl != null ? anhUrl : "";
 
-                            cartItems.add(new CartAdapter.CartItem(productId, ten, gia, soLuong));
+                            cartItems.add(new CartAdapter.CartItem(productId, ten, gia, soLuong, safeAnhUrl));
                             tongTienSanPham += gia * soLuong;
                         }
 
@@ -159,18 +164,14 @@ public class CheckoutActivity extends AppCompatActivity {
     // ----------------------------------------------------------------
     private void handleConfirm() {
         if (cartItems.isEmpty()) {
-            Toast.makeText(this, "Giỏ hàng trống, vui lòng thêm sản phẩm!",
-                    Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Giỏ hàng trống, vui lòng thêm sản phẩm!", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Kiểm tra thông tin giao hàng
         String phone   = binding.tvPhone.getText().toString();
         String address = binding.tvAddress.getText().toString();
         if (phone.contains("Chưa") || address.contains("Chưa")) {
-            Toast.makeText(this,
-                    "Vui lòng cập nhật số điện thoại và địa chỉ trong hồ sơ cá nhân trước!",
-                    Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Vui lòng cập nhật số điện thoại và địa chỉ trong hồ sơ cá nhân trước!", Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -195,13 +196,11 @@ public class CheckoutActivity extends AppCompatActivity {
             sp.put("gia",       item.gia);
             sp.put("soLuong",   item.quantity);
             sp.put("thanhTien", item.gia * item.quantity);
+            sp.put("anhUrl",    item.anhUrl); // <-- LƯU ẢNH VÀO ĐƠN HÀNG ĐỂ DÙNG SAU NÀY
             danhSach.add(sp);
         }
 
-        String thoiGian = new SimpleDateFormat(
-                "dd/MM/yyyy HH:mm", Locale.getDefault()).format(new Date());
-
-        // Lấy thông tin khách hàng từ TextView đã load
+        String thoiGian = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(new Date());
         String tenKH   = binding.tvCustomerName.getText().toString();
         String sdt     = binding.tvPhone.getText().toString();
         String diaChi  = binding.tvAddress.getText().toString().replace("Địa chỉ: ", "");
@@ -219,21 +218,16 @@ public class CheckoutActivity extends AppCompatActivity {
         order.put("trangThai",       "cho_xac_nhan");
         order.put("danhSachSanPham", danhSach);
 
-        DatabaseReference ordersRef = FirebaseDatabase.getInstance(DB_URL)
-                .getReference("orders").child(userId);
-        DatabaseReference cartRef = FirebaseDatabase.getInstance(DB_URL)
-                .getReference("carts").child(userId);
+        DatabaseReference ordersRef = FirebaseDatabase.getInstance(DB_URL).getReference("orders").child(userId);
+        DatabaseReference cartRef = FirebaseDatabase.getInstance(DB_URL).getReference("carts").child(userId);
 
         ordersRef.push().setValue(order)
                 .addOnSuccessListener(unused -> {
                     if ("qr".equals(selectedPayment)) {
-                        // KHÔNG xoá cart, KHÔNG finish() → giữ CheckoutActivity trong stack
                         startActivity(new Intent(this, QRPaymentActivity.class));
                     } else if ("bank".equals(selectedPayment)) {
-                        // KHÔNG xoá cart, KHÔNG finish() → giữ CheckoutActivity trong stack
                         startActivity(new Intent(this, BankTransferActivity.class));
                     } else {
-                        // COD → xoá cart rồi về Shop
                         cartRef.removeValue().addOnSuccessListener(unused2 -> {
                             Toast.makeText(this, "Đặt hàng thành công!", Toast.LENGTH_LONG).show();
                             goBackToShop();
@@ -281,9 +275,6 @@ public class CheckoutActivity extends AppCompatActivity {
         });
     }
 
-    // ----------------------------------------------------------------
-    // Helpers
-    // ----------------------------------------------------------------
     private String getCurrentUserId() {
         return FirebaseAuth.getInstance().getCurrentUser() != null
                 ? FirebaseAuth.getInstance().getCurrentUser().getUid() : null;
@@ -303,9 +294,9 @@ public class CheckoutActivity extends AppCompatActivity {
     }
 
     // ----------------------------------------------------------------
-    // Adapter nội bộ hiển thị sản phẩm read-only trong checkout
+    // Adapter hiển thị sản phẩm trong checkout (Đã cập nhật Glide)
     // ----------------------------------------------------------------
-    private static class OrderItemAdapter extends RecyclerView.Adapter<OrderItemAdapter.VH> {
+    private class OrderItemAdapter extends RecyclerView.Adapter<OrderItemAdapter.VH> { // Bỏ chữ static
 
         private final List<CartAdapter.CartItem> list;
 
@@ -327,17 +318,26 @@ public class CheckoutActivity extends AppCompatActivity {
                     NumberFormat.getNumberInstance(Locale.US)
                             .format(item.gia).replace(",", ".") + "đ");
             holder.tvQty.setText("x" + item.quantity);
+
             holder.btnPlus.setVisibility(View.GONE);
             holder.btnMinus.setVisibility(View.GONE);
             holder.btnDelete.setVisibility(View.GONE);
+
+            // Dùng Glide tải ảnh vào imgProduct
+            Glide.with(holder.itemView.getContext())
+                    .load(item.anhUrl)
+                    .placeholder(R.drawable.pet_welcome)
+                    .error(R.drawable.pet_welcome)
+                    .into(holder.imgProduct);
         }
 
         @Override
         public int getItemCount() { return list.size(); }
 
-        static class VH extends RecyclerView.ViewHolder {
+        class VH extends RecyclerView.ViewHolder {
             TextView tvName, tvPrice, tvQty;
             View     btnPlus, btnMinus, btnDelete;
+            ImageView imgProduct; // Thêm biến chứa ImageView
 
             VH(View v) {
                 super(v);
@@ -347,6 +347,7 @@ public class CheckoutActivity extends AppCompatActivity {
                 btnPlus   = v.findViewById(R.id.btnPlus);
                 btnMinus  = v.findViewById(R.id.btnMinus);
                 btnDelete = v.findViewById(R.id.btnDelete);
+                imgProduct = v.findViewById(R.id.imgProduct); // Ánh xạ ID
             }
         }
     }
