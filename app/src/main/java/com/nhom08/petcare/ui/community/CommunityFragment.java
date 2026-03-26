@@ -12,11 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.database.*;
 import com.nhom08.petcare.databinding.FragmentCommunityBinding;
 
 import java.util.ArrayList;
@@ -27,7 +23,7 @@ public class CommunityFragment extends Fragment {
 
     private FragmentCommunityBinding binding;
     private DatabaseReference postsRef;
-    private List<PostAdapter.PostItem> postList = new ArrayList<>();
+    private final List<PostAdapter.PostItem> postList = new ArrayList<>();
     private PostAdapter adapter;
 
     @Nullable
@@ -37,14 +33,13 @@ public class CommunityFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         binding = FragmentCommunityBinding.inflate(inflater, container, false);
 
-        // 1. Khởi tạo Firebase Reference đến node "posts"
-        postsRef = FirebaseDatabase.getInstance("https://petcare-1ce14-default-rtdb.asia-southeast1.firebasedatabase.app")
-                .getReference("posts");
+        postsRef = FirebaseDatabase.getInstance(
+                "https://petcare-1ce14-default-rtdb.asia-southeast1.firebasedatabase.app"
+        ).getReference("posts");
 
         setupRecyclerView();
         listenForPosts();
 
-        // Ô đăng bài → mở CreatePostActivity
         binding.etPostHint.setOnClickListener(v ->
                 startActivity(new Intent(getActivity(), CreatePostActivity.class)));
         binding.btnPost.setOnClickListener(v ->
@@ -54,42 +49,42 @@ public class CommunityFragment extends Fragment {
     }
 
     private void setupRecyclerView() {
-        // Khởi tạo adapter với list trống và xử lý click vào bài viết
-        adapter = new PostAdapter(postList, post -> {
-            Intent intent = new Intent(getActivity(), PostDetailActivity.class);
-            // Quan trọng: Truyền postId để các màn hình sau biết bài nào mà load dữ liệu
-            intent.putExtra("postId", post.postId);
-            startActivity(intent);
-        });
+        adapter = new PostAdapter(
+                postList,
+                // Click vào bài → mở PostDetail tab Thích (mặc định)
+                post -> openPostDetail(post.postId, false),
+                // Click vào nút bình luận → mở PostDetail tab Bình luận
+                post -> openPostDetail(post.postId, true)
+        );
 
         binding.rvPosts.setLayoutManager(new LinearLayoutManager(getActivity()));
         binding.rvPosts.setAdapter(adapter);
     }
 
+    private void openPostDetail(String postId, boolean navToComments) {
+        Intent intent = new Intent(getActivity(), PostDetailActivity.class);
+        intent.putExtra("postId", postId);
+        intent.putExtra("nav_to_comments", navToComments);
+        startActivity(intent);
+    }
+
     private void listenForPosts() {
-        // 2. Lắng nghe dữ liệu thực tế từ Firebase
         postsRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 postList.clear();
                 for (DataSnapshot data : snapshot.getChildren()) {
-                    // Chuyển dữ liệu từ Firebase thành Object (Nam nhớ kiểm tra class PostItem nhé)
                     PostAdapter.PostItem item = data.getValue(PostAdapter.PostItem.class);
                     if (item != null) {
-                        item.postId = data.getKey(); // Lưu lại ID để dùng cho Like/Comment
+                        item.postId = data.getKey();
                         postList.add(item);
                     }
                 }
-
-                // Đảo ngược danh sách để bài mới nhất hiện lên đầu
-                Collections.reverse(postList);
-
+                Collections.reverse(postList); // Bài mới nhất lên đầu
                 adapter.notifyDataSetChanged();
 
-                // Ẩn ProgressBar nếu Nam có thêm vào layout
-                if (binding.rvPosts.getVisibility() == View.GONE) {
+                if (binding.rvPosts.getVisibility() == View.GONE)
                     binding.rvPosts.setVisibility(View.VISIBLE);
-                }
             }
 
             @Override
