@@ -31,7 +31,6 @@
         <activity android:name=".ui.auth.RegisterActivity"/>
         <activity android:name=".ui.auth.ForgotPasswordActivity"/>
         <activity android:name=".ui.main.MainActivity"/>
-        <activity android:name=".ui.auth.ResetPasswordActivity"/>
         <activity android:name=".ui.health.reminder.AddReminderActivity"/>
         <activity android:name=".ui.health.reminder.ReminderDetailActivity"/>
         <activity android:name=".ui.interactive.InteractActivity"/>

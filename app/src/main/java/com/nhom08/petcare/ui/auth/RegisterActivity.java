@@ -35,7 +35,7 @@ public class RegisterActivity extends AppCompatActivity {
     private void register() {
         String fullName = binding.etFullName.getText().toString().trim();
         String email    = binding.etEmail.getText().toString().trim();
-        String username = binding.etUsername.getText().toString().trim();
+        String phone    = binding.etUsername.getText().toString().trim(); // trường username → phone
         String password = binding.etPassword.getText().toString().trim();
 
         if (fullName.isEmpty()) {
@@ -46,8 +46,8 @@ public class RegisterActivity extends AppCompatActivity {
             binding.etEmail.setError("Vui lòng nhập email");
             return;
         }
-        if (username.isEmpty()) {
-            binding.etUsername.setError("Vui lòng nhập username");
+        if (phone.isEmpty()) {
+            binding.etUsername.setError("Vui lòng nhập số điện thoại");
             return;
         }
         if (password.isEmpty()) {
@@ -64,39 +64,52 @@ public class RegisterActivity extends AppCompatActivity {
         auth.createUserWithEmailAndPassword(email, password)
                 .addOnSuccessListener(result -> {
                     String userId = result.getUser().getUid();
-                    android.util.Log.d("REGISTER", "Auth OK: " + userId);
 
+                    // Lưu thông tin user vào Realtime DB
                     Map<String, Object> user = new HashMap<>();
                     user.put("displayName", fullName);
-                    user.put("username", username);
-                    user.put("email", email);
-                    user.put("phone", "");
-                    user.put("address", "");
+                    user.put("username",    fullName); // giữ username = fullName cho tương thích
+                    user.put("email",       email);
+                    user.put("phone",       phone);
+                    user.put("address",     "");
 
                     db.child("users").child(userId).setValue(user)
                             .addOnSuccessListener(unused -> {
-                                android.util.Log.d("REGISTER", "DB OK!");
-                                Toast.makeText(this,
-                                        "Đăng ký thành công!",
-                                        Toast.LENGTH_SHORT).show();
-                                FirebaseAuth.getInstance().signOut();
-                                Intent intent = new Intent(this, LoginActivity.class);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
-                                        Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                startActivity(intent);
-                                finish();
+                                // Gửi email xác nhận
+                                result.getUser().sendEmailVerification()
+                                        .addOnSuccessListener(v -> {
+                                            Toast.makeText(this,
+                                                    "Đăng ký thành công!\nVui lòng kiểm tra email " + email + " để xác nhận tài khoản.",
+                                                    Toast.LENGTH_LONG).show();
+                                            FirebaseAuth.getInstance().signOut();
+                                            Intent intent = new Intent(this, LoginActivity.class);
+                                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+                                                    Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                            startActivity(intent);
+                                            finish();
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            // Vẫn đăng ký thành công, chỉ không gửi được mail
+                                            Toast.makeText(this,
+                                                    "Đăng ký thành công! (Không gửi được email xác nhận)",
+                                                    Toast.LENGTH_SHORT).show();
+                                            FirebaseAuth.getInstance().signOut();
+                                            Intent intent = new Intent(this, LoginActivity.class);
+                                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+                                                    Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                            startActivity(intent);
+                                            finish();
+                                        });
                             })
                             .addOnFailureListener(e -> {
-                                android.util.Log.e("REGISTER", "DB Error: " + e.getMessage());
                                 binding.btnSubmit.setEnabled(true);
                                 FirebaseAuth.getInstance().signOut();
                                 Toast.makeText(this,
-                                        "Lỗi DB: " + e.getMessage(),
+                                        "Lỗi lưu dữ liệu: " + e.getMessage(),
                                         Toast.LENGTH_LONG).show();
                             });
                 })
                 .addOnFailureListener(e -> {
-                    android.util.Log.e("REGISTER", "Auth Error: " + e.getMessage());
                     binding.btnSubmit.setEnabled(true);
                     Toast.makeText(this,
                             "Đăng ký thất bại: " + e.getMessage(),

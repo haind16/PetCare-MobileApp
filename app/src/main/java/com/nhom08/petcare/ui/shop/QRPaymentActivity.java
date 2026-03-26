@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.FirebaseDatabase;
 import com.nhom08.petcare.R;
 import com.nhom08.petcare.databinding.ActivityQrPaymentBinding;
@@ -32,28 +33,28 @@ public class QRPaymentActivity extends AppCompatActivity {
     }
 
     private void confirmPaid() {
-        // Cập nhật trạng thái đơn hàng mới nhất → "da_thanh_toan"
         String userId = FirebaseAuth.getInstance().getCurrentUser() != null
-                ? FirebaseAuth.getInstance().getCurrentUser().getUid()
-                : null;
+                ? FirebaseAuth.getInstance().getCurrentUser().getUid() : null;
 
         if (userId != null) {
+            // Cập nhật trạng thái đơn hàng
             FirebaseDatabase.getInstance(DB_URL)
-                    .getReference("orders")
-                    .child(userId)
-                    .orderByKey()
-                    .limitToLast(1)
-                    .get()
+                    .getReference("orders").child(userId)
+                    .orderByKey().limitToLast(1).get()
                     .addOnSuccessListener(snapshot -> {
-                        for (com.google.firebase.database.DataSnapshot child : snapshot.getChildren()) {
+                        for (DataSnapshot child : snapshot.getChildren()) {
                             child.getRef().child("trangThai").setValue("da_thanh_toan");
                         }
                     });
+
+            // Xoá giỏ hàng tại đây
+            FirebaseDatabase.getInstance(DB_URL)
+                    .getReference("carts").child(userId).removeValue();
         }
 
-        Toast.makeText(this, "Xác nhận thanh toán QR thành công! 🎉",
-                Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Thanh toán QR thành công! 🎉", Toast.LENGTH_SHORT).show();
 
+        // Về Shop, xoá toàn bộ stack phía trên
         Intent intent = new Intent(this, com.nhom08.petcare.ui.main.MainActivity.class);
         intent.putExtra("nav_to", "shop");
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);

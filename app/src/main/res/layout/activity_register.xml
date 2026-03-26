@@ -57,6 +57,7 @@
                 android:scaleType="centerCrop"
                 android:src="@drawable/pet_welcome" />
 
+            <!-- Họ và tên -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -71,6 +72,7 @@
                 android:paddingStart="12dp"
                 android:inputType="textPersonName"/>
 
+            <!-- Email -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -86,11 +88,12 @@
                 android:paddingStart="12dp"
                 android:inputType="textEmailAddress"/>
 
+            <!-- Số điện thoại — đổi từ Username -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Username"
+                android:text="Số điện thoại"
                 android:textSize="14sp"/>
             <EditText
                 android:id="@+id/etUsername"
@@ -99,8 +102,9 @@
                 android:layout_marginTop="4dp"
                 android:background="@drawable/btn_outline"
                 android:paddingStart="12dp"
-                android:inputType="text"/>
+                android:inputType="phone" />
 
+            <!-- Mật khẩu -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
