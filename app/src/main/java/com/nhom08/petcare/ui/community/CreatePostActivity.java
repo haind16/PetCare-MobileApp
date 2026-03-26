@@ -99,8 +99,11 @@ public class CreatePostActivity extends AppCompatActivity {
         data.put("content", content);
         data.put("imageUrl", imagePath);
         data.put("timestamp", System.currentTimeMillis());
+
+        // PHẦN BỔ SUNG:
         data.put("likes", 0L);
-        data.put("comments_count", 0L); // BẮT BUỘC khởi tạo là 0
+        data.put("comments_count", 0L);   // Biến đếm số lượng (kiểu số)
+        //data.put("comments_data", "");    // Nơi chứa danh sách cmt (khởi tạo rỗng)
 
         if (postId != null) {
             db.child("posts").child(postId).setValue(data).addOnSuccessListener(aVoid -> {
