@@ -15,6 +15,8 @@ import com.nhom08.petcare.databinding.ActivityPostDetailBinding;
 
 import java.io.File;
 
+import java.io.File;
+
 public class PostDetailActivity extends AppCompatActivity {
 
     private ActivityPostDetailBinding binding;
@@ -80,7 +82,10 @@ public class PostDetailActivity extends AppCompatActivity {
 
                 if (img != null && !img.isEmpty()) {
                     binding.imgPost.setVisibility(View.VISIBLE);
-                    Glide.with(PostDetailActivity.this).load(new File(img)).into(binding.imgPost);
+                    Object imageSource = img.startsWith("http")
+                            ? img              // URL Cloudinary
+                            : new File(img);   // File Internal (ảnh cũ)
+                    Glide.with(PostDetailActivity.this).load(imageSource).into(binding.imgPost);
                 } else {
                     binding.imgPost.setVisibility(View.GONE);
                 }

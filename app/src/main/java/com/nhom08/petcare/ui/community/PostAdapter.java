@@ -63,11 +63,14 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         holder.tvLikeCount.setText(String.valueOf(item.likes));
         holder.tvCommentCount.setText(String.valueOf(item.comments_count));
 
-        // Load ảnh bài đăng
+        // Load ảnh bài đăng — hỗ trợ cả URL Cloudinary (https://) và File Internal
         if (item.imageUrl != null && !item.imageUrl.isEmpty()) {
             holder.imgPost.setVisibility(View.VISIBLE);
+            Object imageSource = item.imageUrl.startsWith("http")
+                    ? item.imageUrl          // URL Cloudinary
+                    : new File(item.imageUrl); // File Internal (ảnh cũ)
             Glide.with(holder.itemView.getContext())
-                    .load(new File(item.imageUrl))
+                    .load(imageSource)
                     .into(holder.imgPost);
         } else {
             holder.imgPost.setVisibility(View.GONE);
