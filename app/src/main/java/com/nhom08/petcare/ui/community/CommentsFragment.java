@@ -13,10 +13,11 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.*;
-import com.nhom08.petcare.databinding.FragmentCommentsBinding;
 import com.nhom08.petcare.R;
+import com.nhom08.petcare.databinding.FragmentCommentsBinding;
 
 import java.util.*;
 
@@ -30,15 +31,14 @@ public class CommentsFragment extends Fragment {
     private RecyclerView.Adapter<?> adapter;
 
     public static class Comment {
-        public String userName, content;
+        public String userName, content, avatarUrl;
         public long timestamp;
         public Comment() {}
     }
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         binding = FragmentCommentsBinding.inflate(inflater, container, false);
 
@@ -48,15 +48,12 @@ public class CommentsFragment extends Fragment {
             return binding.getRoot();
         }
 
-        postRef = FirebaseDatabase.getInstance(DB_URL)
-                .getReference("posts")
-                .child(postId);
+        postRef = FirebaseDatabase.getInstance(DB_URL).getReference("posts").child(postId);
 
         setupRecyclerView();
         listenForComments();
 
         binding.btnSendComment.setOnClickListener(v -> sendComment());
-
         return binding.getRoot();
     }
 
@@ -73,10 +70,23 @@ public class CommentsFragment extends Fragment {
             }
 
             @Override
-            public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+            public void onBindViewHolder(@NonNull RecyclerView.ViewHolder h, int position) {
                 Comment c = list.get(position);
-                ((TextView) holder.itemView.findViewById(R.id.tvUserName)).setText(c.userName);
-                ((TextView) holder.itemView.findViewById(R.id.tvComment)).setText(c.content);
+                ((TextView) h.itemView.findViewById(R.id.tvUserName)).setText(c.userName);
+                ((TextView) h.itemView.findViewById(R.id.tvComment)).setText(c.content);
+
+                // Load avatar
+                de.hdodenhof.circleimageview.CircleImageView imgAvatar =
+                        h.itemView.findViewById(R.id.imgAvatar);
+                if (c.avatarUrl != null && !c.avatarUrl.isEmpty()) {
+                    Glide.with(h.itemView.getContext())
+                            .load(c.avatarUrl)
+                            .placeholder(R.drawable.pet_welcome)
+                            .circleCrop()
+                            .into(imgAvatar);
+                } else {
+                    imgAvatar.setImageResource(R.drawable.pet_welcome);
+                }
             }
 
             @Override
@@ -92,12 +102,10 @@ public class CommentsFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 list.clear();
                 for (DataSnapshot d : snapshot.getChildren()) {
-                    // Bỏ qua nếu node này là String rỗng (dữ liệu cũ)
-                    if (!d.hasChildren()) continue;
+                    if (!d.hasChildren()) continue; // bỏ qua node String rỗng cũ
                     Comment c = d.getValue(Comment.class);
                     if (c != null) list.add(c);
                 }
-                // Sắp xếp theo thời gian tăng dần (cmt cũ nhất lên trên)
                 list.sort((a, b) -> Long.compare(a.timestamp, b.timestamp));
                 adapter.notifyDataSetChanged();
             }
@@ -125,29 +133,26 @@ public class CommentsFragment extends Fragment {
             return;
         }
 
-        // Khóa nút gửi tránh bấm nhiều lần
         binding.btnSendComment.setEnabled(false);
 
-        // Lấy displayName từ Firebase — PHẢI dùng cùng DB_URL
-        FirebaseDatabase.getInstance(DB_URL)
-                .getReference("users")
-                .child(uid)
-                .get()
+        FirebaseDatabase.getInstance(DB_URL).getReference("users").child(uid).get()
                 .addOnSuccessListener(snapshot -> {
                     String name = snapshot.child("displayName").getValue(String.class);
-                    if (name == null || name.isEmpty()) {
+                    if (name == null || name.isEmpty())
                         name = snapshot.child("username").getValue(String.class);
-                    }
                     final String finalName = (name != null && !name.isEmpty()) ? name : "Thành viên";
+
+                    String avatar = snapshot.child("avatarUrl").getValue(String.class);
+                    final String finalAvatar = (avatar != null) ? avatar : "";
 
                     Map<String, Object> data = new HashMap<>();
                     data.put("userName", finalName);
+                    data.put("avatarUrl", finalAvatar);  // Lưu avatar vào comment
                     data.put("content", text);
                     data.put("timestamp", System.currentTimeMillis());
 
                     postRef.child("comments_data").push().setValue(data)
                             .addOnSuccessListener(aVoid -> {
-                                // Tăng comments_count bằng transaction (tránh race condition)
                                 postRef.child("comments_count").runTransaction(new Transaction.Handler() {
                                     @NonNull
                                     @Override
@@ -156,13 +161,10 @@ public class CommentsFragment extends Fragment {
                                         md.setValue(current == null ? 1L : current + 1L);
                                         return Transaction.success(md);
                                     }
-
                                     @Override
-                                    public void onComplete(@Nullable DatabaseError error,
-                                                           boolean committed,
-                                                           @Nullable DataSnapshot snapshot) {}
+                                    public void onComplete(@Nullable DatabaseError e, boolean b,
+                                                           @Nullable DataSnapshot s) {}
                                 });
-
                                 if (binding != null) {
                                     binding.etComment.setText("");
                                     binding.btnSendComment.setEnabled(true);

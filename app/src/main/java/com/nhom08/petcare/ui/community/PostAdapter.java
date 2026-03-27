@@ -17,6 +17,7 @@ import com.nhom08.petcare.R;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder> {
 
@@ -105,8 +106,15 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         holder.btnLike.setOnClickListener(v -> {
             if (!item.isLiked) {
                 db.child("users").child(myUid).get().addOnSuccessListener(s -> {
-                    String name = s.child("displayName").getValue(String.class);
-                    postRef.child("userLikes").child(myUid).setValue(name != null ? name : "Thành viên");
+                    String name   = s.child("displayName").getValue(String.class);
+                    String avatar = s.child("avatarUrl").getValue(String.class);
+
+                    // Lưu object {name, avatarUrl} thay vì chỉ String tên
+                    Map<String, Object> likeData = new java.util.HashMap<>();
+                    likeData.put("name",      name != null && !name.isEmpty() ? name : "Thành viên");
+                    likeData.put("avatarUrl", avatar != null ? avatar : "");
+
+                    postRef.child("userLikes").child(myUid).setValue(likeData);
                     postRef.child("likes").setValue(item.likes + 1);
                 });
             } else {
