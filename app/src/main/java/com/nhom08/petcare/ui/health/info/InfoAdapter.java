@@ -8,40 +8,39 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
 import com.nhom08.petcare.R;
 import java.util.ArrayList;
 import java.util.List;
 
-public class InfoAdapter extends
-        RecyclerView.Adapter<InfoAdapter.InfoViewHolder> {
+public class InfoAdapter extends RecyclerView.Adapter<InfoAdapter.InfoViewHolder> {
 
-    // ----------------------------------------------------------------
-    // Model — dùng chung cho benh_ly / dinh_duong / phong_kham
-    // Các trường extra được pass sang InfoDetailActivity qua Intent
-    // ----------------------------------------------------------------
     public static class InfoItem {
         public String name;
         public String desc;
         public String tag;
         public String tagColor;
+        public String anhUrl;    // Ảnh icon vuông nhỏ
+        public String anhBiaUrl; // THÊM DÒNG NÀY: Ảnh bìa ngang to
 
-        // Extra fields cho detail page
-        public String field1; // trieuChung / thucPhamNenAn / diaChi
-        public String field2; // nguyenNhan / thucPhamKhongNenAn / soDienThoai
-        public String field3; // huongChamSoc / luuYKhauPhan / gioMoCua
-        public String field4; // mucDoNguyHiem / doTuoi / danhGia (String)
+        public String field1;
+        public String field2;
+        public String field3;
+        public String field4;
 
-        public InfoItem(String name, String desc, String tag, String tagColor) {
-            this.name     = name;
-            this.desc     = desc;
-            this.tag      = tag;
-            this.tagColor = tagColor;
+        // Cập nhật hàm khởi tạo
+        public InfoItem(String name, String desc, String tag, String tagColor, String anhUrl, String anhBiaUrl) {
+            this.name      = name;
+            this.desc      = desc;
+            this.tag       = tag;
+            this.tagColor  = tagColor;
+            this.anhUrl    = anhUrl;
+            this.anhBiaUrl = anhBiaUrl; // Gán giá trị
         }
     }
 
-    public interface OnItemClickListener {
-        void onClick(InfoItem item);
-    }
+    public interface OnItemClickListener { void onClick(InfoItem item); }
 
     private final List<InfoItem>       allList     = new ArrayList<>();
     private final List<InfoItem>       displayList = new ArrayList<>();
@@ -53,16 +52,12 @@ public class InfoAdapter extends
         this.listener = listener;
     }
 
-    /** Cập nhật toàn bộ data (gọi sau khi Firebase load xong) */
     public void setData(List<InfoItem> newList) {
-        allList.clear();
-        allList.addAll(newList);
-        displayList.clear();
-        displayList.addAll(newList);
+        allList.clear(); allList.addAll(newList);
+        displayList.clear(); displayList.addAll(newList);
         notifyDataSetChanged();
     }
 
-    /** Lọc danh sách theo từ khoá */
     public void filter(String keyword) {
         displayList.clear();
         if (keyword == null || keyword.trim().isEmpty()) {
@@ -70,9 +65,7 @@ public class InfoAdapter extends
         } else {
             String kw = keyword.toLowerCase().trim();
             for (InfoItem item : allList) {
-                if (item.name.toLowerCase().contains(kw)
-                        || item.desc.toLowerCase().contains(kw)
-                        || item.tag.toLowerCase().contains(kw)) {
+                if (item.name.toLowerCase().contains(kw) || item.desc.toLowerCase().contains(kw) || item.tag.toLowerCase().contains(kw)) {
                     displayList.add(item);
                 }
             }
@@ -83,8 +76,7 @@ public class InfoAdapter extends
     @NonNull
     @Override
     public InfoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_info, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_info, parent, false);
         return new InfoViewHolder(view);
     }
 
@@ -95,13 +87,15 @@ public class InfoAdapter extends
         holder.tvDesc.setText(item.desc);
         holder.tvTag.setText(item.tag);
 
-        try {
-            holder.tvTag.getBackground().setTint(Color.parseColor(item.tagColor));
-        } catch (Exception ignored) {}
+        // Dùng Glide tải ảnh thu nhỏ ở danh sách (Dùng anhUrl)
+        Glide.with(holder.itemView.getContext())
+                .load(item.anhUrl)
+                .placeholder(R.drawable.pet_welcome)
+                .error(R.drawable.pet_welcome)
+                .into(holder.imgItem);
 
-        holder.itemView.setOnClickListener(v -> {
-            if (listener != null) listener.onClick(item);
-        });
+        try { holder.tvTag.getBackground().setTint(Color.parseColor(item.tagColor)); } catch (Exception ignored) {}
+        holder.itemView.setOnClickListener(v -> { if (listener != null) listener.onClick(item); });
     }
 
     @Override
@@ -110,7 +104,6 @@ public class InfoAdapter extends
     static class InfoViewHolder extends RecyclerView.ViewHolder {
         ImageView imgItem;
         TextView  tvName, tvDesc, tvTag;
-
         InfoViewHolder(View itemView) {
             super(itemView);
             imgItem = itemView.findViewById(R.id.imgItem);

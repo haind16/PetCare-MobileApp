@@ -5,7 +5,6 @@
     android:orientation="vertical"
     android:background="@color/white">
 
-    <!-- Header -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="56dp"
@@ -21,7 +20,7 @@
             android:layout_height="32dp"
             android:padding="4dp"
             android:src="@drawable/ic_back"
-            android:tint="@color/white"/>
+            android:tint="@color/white" />
 
         <TextView
             android:layout_width="0dp"
@@ -32,7 +31,7 @@
             android:textColor="@color/white"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:layout_marginEnd="32dp"/>
+            android:layout_marginEnd="32dp" />
     </LinearLayout>
 
     <ScrollView
@@ -46,13 +45,12 @@
             android:orientation="vertical"
             android:padding="24dp">
 
-            <!-- Tên -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Tên"
+                android:text="Tên thú cưng"
                 android:textSize="14sp"
-                android:textColor="#333333"/>
+                android:textColor="#333333" />
             <EditText
                 android:id="@+id/etName"
                 android:layout_width="match_parent"
@@ -63,72 +61,28 @@
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"
                 android:inputType="textPersonName"
-                android:textSize="14sp"/>
+                android:textSize="14sp" />
 
-            <!-- Giới tính -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Giới tính"
+                android:text="Loài (Chó / Mèo)"
                 android:textSize="14sp"
-                android:textColor="#333333"/>
-            <EditText
-                android:id="@+id/etGender"
+                android:textColor="#333333" />
+            <Spinner
+                android:id="@+id/spLoai"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_marginTop="4dp"
-                android:layout_marginBottom="16dp"
                 android:background="@drawable/edit_text_border"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                android:inputType="text"
-                android:textSize="14sp"/>
+                android:layout_marginBottom="16dp" />
 
-            <!-- Cân nặng -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Cân nặng"
+                android:text="Giống (VD: Corgi, Anh lông ngắn...)"
                 android:textSize="14sp"
-                android:textColor="#333333"/>
-            <EditText
-                android:id="@+id/etWeight"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="16dp"
-                android:background="@drawable/edit_text_border"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                android:inputType="numberDecimal"
-                android:textSize="14sp"/>
-
-            <!-- Ngày sinh -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Ngày sinh"
-                android:textSize="14sp"
-                android:textColor="#333333"/>
-            <EditText
-                android:id="@+id/etBirthDate"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="16dp"
-                android:background="@drawable/edit_text_border"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                android:inputType="date"
-                android:textSize="14sp"/>
-
-            <!-- Giống -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Giống"
-                android:textSize="14sp"
-                android:textColor="#333333"/>
+                android:textColor="#333333" />
             <EditText
                 android:id="@+id/etBreed"
                 android:layout_width="match_parent"
@@ -139,17 +93,48 @@
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"
                 android:inputType="text"
-                android:textSize="14sp"/>
+                android:textSize="14sp" />
 
-            <!-- Điều kiện sống -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Điều kiện sống"
+                android:text="Giới tính"
                 android:textSize="14sp"
-                android:textColor="#333333"/>
+                android:textColor="#333333" />
+            <Spinner
+                android:id="@+id/spGender"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/edit_text_border"
+                android:layout_marginBottom="16dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cân nặng (kg)"
+                android:textSize="14sp"
+                android:textColor="#333333" />
             <EditText
-                android:id="@+id/etLivingCondition"
+                android:id="@+id/etWeight"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/edit_text_border"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:inputType="numberDecimal"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ngày sinh (DD/MM/YYYY)"
+                android:textSize="14sp"
+                android:textColor="#333333" />
+            <EditText
+                android:id="@+id/etBirthDate"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_marginTop="4dp"
@@ -157,8 +142,8 @@
                 android:background="@drawable/edit_text_border"
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"
-                android:inputType="text"
-                android:textSize="14sp"/>
+                android:inputType="date"
+                android:textSize="14sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -167,15 +152,14 @@
                 android:gravity="center"
                 android:layout_marginBottom="24dp">
 
-                <!-- Preview ảnh -->
-                <de.hdodenhof.circleimageview.CircleImageView
+                <ImageView
                     android:id="@+id/imgPetPreview"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
                     android:src="@drawable/pet_welcome"
-                    android:layout_marginBottom="12dp"/>
+                    android:scaleType="centerCrop"
+                    android:layout_marginBottom="12dp" />
 
-                <!-- Nút chọn ảnh -->
                 <LinearLayout
                     android:id="@+id/btnPickImage"
                     android:layout_width="wrap_content"
@@ -191,31 +175,29 @@
                         android:layout_height="20dp"
                         android:src="@drawable/ic_camera"
                         android:tint="@color/primary_blue"
-                        android:layout_marginEnd="6dp"/>
+                        android:layout_marginEnd="6dp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Chọn ảnh"
                         android:textSize="13sp"
-                        android:textColor="@color/primary_blue"/>
+                        android:textColor="@color/primary_blue" />
                 </LinearLayout>
             </LinearLayout>
-
         </LinearLayout>
     </ScrollView>
 
-    <!-- Nút Xác nhận -->
     <Button
         android:id="@+id/btnConfirm"
         android:layout_width="match_parent"
         android:layout_height="52dp"
         android:layout_margin="16dp"
         android:background="@drawable/bg_purple_btn"
-        android:text="Xác nhận thêm thú cưng mới"
+        android:text="Xác nhận lưu thông tin"
         android:textColor="@color/white"
         android:textSize="15sp"
         android:textAllCaps="false"
-        android:textStyle="bold"/>
+        android:textStyle="bold" />
 
 </LinearLayout>

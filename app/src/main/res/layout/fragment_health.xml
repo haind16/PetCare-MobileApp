@@ -103,7 +103,7 @@
                     <ImageView
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:src="@drawable/pet_welcome"
+                        android:src="@drawable/benhly"
                         android:scaleType="centerCrop"
                         android:layout_marginEnd="16dp"/>
 
@@ -157,7 +157,7 @@
                     <ImageView
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:src="@drawable/pet_welcome"
+                        android:src="@drawable/dinhduong"
                         android:scaleType="centerCrop"
                         android:layout_marginEnd="16dp"/>
 
@@ -211,7 +211,7 @@
                     <ImageView
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:src="@drawable/pet_welcome"
+                        android:src="@drawable/thuy"
                         android:scaleType="centerCrop"
                         android:layout_marginEnd="16dp"/>
 
@@ -265,7 +265,7 @@
                     <ImageView
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:src="@drawable/pet_welcome"
+                        android:src="@drawable/hoso"
                         android:scaleType="centerCrop"
                         android:layout_marginEnd="16dp"/>
 
@@ -319,7 +319,7 @@
                     <ImageView
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:src="@drawable/pet_welcome"
+                        android:src="@drawable/nhatky"
                         android:scaleType="centerCrop"
                         android:layout_marginEnd="16dp"/>
 

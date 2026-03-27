@@ -57,6 +57,9 @@ public class MainActivity extends AppCompatActivity {
         if ("shop".equals(navTo)) {
             binding.bottomNav.setSelectedItemId(R.id.nav_shop);
             loadFragment(new ShopFragment());
+        } else if ("health".equals(navTo)) {          // ← thêm case này
+            binding.bottomNav.setSelectedItemId(R.id.nav_health);
+            loadFragment(new HealthFragment());
         }
     }
 

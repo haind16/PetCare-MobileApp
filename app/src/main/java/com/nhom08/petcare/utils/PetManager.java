@@ -5,13 +5,14 @@ import android.content.SharedPreferences;
 
 public class PetManager {
 
-    private static final String PREF_NAME = "pet_prefs";
-    private static final String KEY_PET_ID = "current_pet_id";
+    private static final String PREF_NAME   = "pet_prefs";
+    private static final String KEY_PET_ID   = "current_pet_id";
     private static final String KEY_PET_NAME = "current_pet_name";
     private static final String KEY_PET_TYPE = "current_pet_type";
+    private static final String KEY_PET_ANH  = "current_pet_anh";
 
     private static PetManager instance;
-    private SharedPreferences prefs;
+    private final SharedPreferences prefs;
 
     private PetManager(Context context) {
         prefs = context.getApplicationContext()
@@ -25,16 +26,14 @@ public class PetManager {
         return instance;
     }
 
-    // Lưu pet đang chọn
-    public void setCurrentPet(String petId, String petName, String petType) {
+    public void setCurrentPet(String petId, String petName, String anhUrl) {
         prefs.edit()
-                .putString(KEY_PET_ID, petId)
+                .putString(KEY_PET_ID,   petId)
                 .putString(KEY_PET_NAME, petName)
-                .putString(KEY_PET_TYPE, petType)
+                .putString(KEY_PET_ANH,  anhUrl != null ? anhUrl : "")
                 .apply();
     }
 
-    // Lấy thông tin pet hiện tại
     public String getCurrentPetId() {
         return prefs.getString(KEY_PET_ID, null);
     }
@@ -47,10 +46,25 @@ public class PetManager {
         return prefs.getString(KEY_PET_TYPE, "");
     }
 
-    public boolean hasPet() {
-        return getCurrentPetId() != null;
+    public String getCurrentPetAnh() {
+        return prefs.getString(KEY_PET_ANH, "");
     }
 
+    // ✅ Fix: check cả null lẫn empty string
+    public boolean hasPet() {
+        String id = getCurrentPetId();
+        return id != null && !id.isEmpty();
+    }
+
+    public void clearCurrentPet() {
+        prefs.edit()
+                .remove(KEY_PET_ID)
+                .remove(KEY_PET_NAME)
+                .remove(KEY_PET_ANH)
+                .apply();
+    }
+
+    // Xóa toàn bộ (dùng khi logout)
     public void clear() {
         prefs.edit().clear().apply();
     }
