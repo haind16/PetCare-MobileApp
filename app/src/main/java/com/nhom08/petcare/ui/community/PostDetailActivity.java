@@ -11,9 +11,8 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import com.bumptech.glide.Glide;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.firebase.database.*;
+import com.nhom08.petcare.R;
 import com.nhom08.petcare.databinding.ActivityPostDetailBinding;
-
-import java.io.File;
 
 import java.io.File;
 
@@ -69,28 +68,39 @@ public class PostDetailActivity extends AppCompatActivity {
         postRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                String user    = snapshot.child("userName").getValue(String.class);
-                String content = snapshot.child("content").getValue(String.class);
-                String img     = snapshot.child("imageUrl").getValue(String.class);
-                Long likes     = snapshot.child("likes").getValue(Long.class);
-                Long cmts      = snapshot.child("comments_count").getValue(Long.class);
+                String user      = snapshot.child("userName").getValue(String.class);
+                String content   = snapshot.child("content").getValue(String.class);
+                String img       = snapshot.child("imageUrl").getValue(String.class);
+                String avatarUrl = snapshot.child("avatarUrl").getValue(String.class);
+                Long likes       = snapshot.child("likes").getValue(Long.class);
+                Long cmts        = snapshot.child("comments_count").getValue(Long.class);
 
                 binding.tvUserName.setText(user != null ? user : "Người dùng");
                 binding.tvContent.setText(content != null ? content : "");
                 binding.tvLikeCount.setText(String.valueOf(likes != null ? likes : 0));
                 binding.tvCommentCount.setText(String.valueOf(cmts != null ? cmts : 0));
 
+                // Load avatar
+                if (avatarUrl != null && !avatarUrl.isEmpty()) {
+                    Glide.with(PostDetailActivity.this)
+                            .load(avatarUrl)
+                            .placeholder(R.drawable.pet_welcome)
+                            .circleCrop()
+                            .into(binding.imgAvatar);
+                } else {
+                    binding.imgAvatar.setImageResource(R.drawable.pet_welcome);
+                }
+
+                // Load ảnh bài đăng
                 if (img != null && !img.isEmpty()) {
                     binding.imgPost.setVisibility(View.VISIBLE);
-                    Object imageSource = img.startsWith("http")
-                            ? img              // URL Cloudinary
-                            : new File(img);   // File Internal (ảnh cũ)
+                    Object imageSource = img.startsWith("http") ? img : new File(img);
                     Glide.with(PostDetailActivity.this).load(imageSource).into(binding.imgPost);
                 } else {
                     binding.imgPost.setVisibility(View.GONE);
                 }
 
-                // Cập nhật tiêu đề tab kèm số lượng
+                // Cập nhật tiêu đề tab
                 if (binding.tabLayout.getTabAt(0) != null)
                     binding.tabLayout.getTabAt(0).setText("Thích (" + (likes != null ? likes : 0) + ")");
                 if (binding.tabLayout.getTabAt(1) != null)

@@ -12,7 +12,11 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.bumptech.glide.Glide;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.*;
+import com.nhom08.petcare.R;
 import com.nhom08.petcare.databinding.FragmentCommunityBinding;
 
 import java.util.ArrayList;
@@ -20,6 +24,8 @@ import java.util.Collections;
 import java.util.List;
 
 public class CommunityFragment extends Fragment {
+
+    private static final String DB_URL = "https://petcare-1ce14-default-rtdb.asia-southeast1.firebasedatabase.app";
 
     private FragmentCommunityBinding binding;
     private DatabaseReference postsRef;
@@ -33,12 +39,11 @@ public class CommunityFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         binding = FragmentCommunityBinding.inflate(inflater, container, false);
 
-        postsRef = FirebaseDatabase.getInstance(
-                "https://petcare-1ce14-default-rtdb.asia-southeast1.firebasedatabase.app"
-        ).getReference("posts");
+        postsRef = FirebaseDatabase.getInstance(DB_URL).getReference("posts");
 
         setupRecyclerView();
         listenForPosts();
+        loadCurrentUserInfo();
 
         binding.etPostHint.setOnClickListener(v ->
                 startActivity(new Intent(getActivity(), CreatePostActivity.class)));
@@ -48,12 +53,33 @@ public class CommunityFragment extends Fragment {
         return binding.getRoot();
     }
 
+    private void loadCurrentUserInfo() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) return;
+
+        FirebaseDatabase.getInstance(DB_URL)
+                .getReference("users")
+                .child(user.getUid())
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    if (binding == null) return;
+
+                    // Load avatar vào ô đăng bài
+                    String avatarUrl = snapshot.child("avatarUrl").getValue(String.class);
+                    if (avatarUrl != null && !avatarUrl.isEmpty()) {
+                        Glide.with(this)
+                                .load(avatarUrl)
+                                .placeholder(R.drawable.pet_welcome)
+                                .circleCrop()
+                                .into(binding.imgCurrentUserAvatar);
+                    }
+                });
+    }
+
     private void setupRecyclerView() {
         adapter = new PostAdapter(
                 postList,
-                // Click vào bài → mở PostDetail tab Thích (mặc định)
                 post -> openPostDetail(post.postId, false),
-                // Click vào nút bình luận → mở PostDetail tab Bình luận
                 post -> openPostDetail(post.postId, true)
         );
 
@@ -80,10 +106,10 @@ public class CommunityFragment extends Fragment {
                         postList.add(item);
                     }
                 }
-                Collections.reverse(postList); // Bài mới nhất lên đầu
+                Collections.reverse(postList);
                 adapter.notifyDataSetChanged();
 
-                if (binding.rvPosts.getVisibility() == View.GONE)
+                if (binding != null && binding.rvPosts.getVisibility() == View.GONE)
                     binding.rvPosts.setVisibility(View.VISIBLE);
             }
 

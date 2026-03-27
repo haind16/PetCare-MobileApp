@@ -9,10 +9,12 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.nhom08.petcare.R;
 import com.nhom08.petcare.databinding.ActivityCreatePostBinding;
 
 import org.json.JSONObject;
@@ -66,6 +68,8 @@ public class CreatePostActivity extends AppCompatActivity {
             binding.layoutPreview.setVisibility(View.GONE);
         });
 
+        loadCurrentUserInfo();  // Hiện avatar + tên ngay khi mở màn hình
+
         binding.btnPost.setOnClickListener(v -> {
             String content = binding.etContent.getText().toString().trim();
             if (content.isEmpty()) {
@@ -78,6 +82,30 @@ public class CreatePostActivity extends AppCompatActivity {
         });
     }
 
+    private void loadCurrentUserInfo() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) return;
+
+        db.child("users").child(user.getUid()).get().addOnSuccessListener(snapshot -> {
+            // Hiện tên
+            String name = snapshot.child("displayName").getValue(String.class);
+            if (name == null || name.isEmpty())
+                name = snapshot.child("username").getValue(String.class);
+            if (name != null && !name.isEmpty())
+                binding.tvUserName.setText(name);
+
+            // Hiện avatar
+            String avatarUrl = snapshot.child("avatarUrl").getValue(String.class);
+            if (avatarUrl != null && !avatarUrl.isEmpty()) {
+                Glide.with(this)
+                        .load(avatarUrl)
+                        .placeholder(R.drawable.pet_welcome)
+                        .circleCrop()
+                        .into(binding.imgUserAvatar);
+            }
+        });
+    }
+
     private void fetchNameAndUpload(String content) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) {
@@ -87,6 +115,7 @@ public class CreatePostActivity extends AppCompatActivity {
 
         db.child("users").child(user.getUid()).get().addOnCompleteListener(task -> {
             String finalName = "Người dùng PetCare";
+            String finalAvatar = "";
             if (task.isSuccessful() && task.getResult().exists()) {
                 String dbName = task.getResult().child("displayName").getValue(String.class);
                 if (dbName != null && !dbName.isEmpty()) {
@@ -95,28 +124,29 @@ public class CreatePostActivity extends AppCompatActivity {
                     String dbUsername = task.getResult().child("username").getValue(String.class);
                     if (dbUsername != null && !dbUsername.isEmpty()) finalName = dbUsername;
                 }
+                String dbAvatar = task.getResult().child("avatarUrl").getValue(String.class);
+                if (dbAvatar != null) finalAvatar = dbAvatar;
             }
             final String userName = finalName;
+            final String avatarUrl = finalAvatar;
 
             if (selectedImageUri != null) {
-                uploadToCloudinary(content, userName);
+                uploadToCloudinary(content, userName, avatarUrl);
             } else {
-                executePost(content, userName, "");
+                executePost(content, userName, "", avatarUrl);
             }
         });
     }
 
-    private void uploadToCloudinary(String content, String userName) {
+    private void uploadToCloudinary(String content, String userName, String avatarUrl) {
         runOnUiThread(() -> binding.btnPost.setText("Đang tải ảnh..."));
 
         executor.execute(() -> {
             try {
-                // Đọc ảnh từ URI
                 InputStream inputStream = getContentResolver().openInputStream(selectedImageUri);
                 byte[] imageBytes = inputStream.readAllBytes();
                 inputStream.close();
 
-                // Tạo request multipart gửi lên Cloudinary
                 OkHttpClient client = new OkHttpClient();
                 RequestBody requestBody = new MultipartBody.Builder()
                         .setType(MultipartBody.FORM)
@@ -135,8 +165,8 @@ public class CreatePostActivity extends AppCompatActivity {
 
                 if (response.isSuccessful()) {
                     JSONObject json = new JSONObject(responseBody);
-                    String imageUrl = json.getString("secure_url"); // URL https public
-                    runOnUiThread(() -> executePost(content, userName, imageUrl));
+                    String imageUrl = json.getString("secure_url");
+                    runOnUiThread(() -> executePost(content, userName, imageUrl, avatarUrl));
                 } else {
                     runOnUiThread(() -> onPostFailed("Upload ảnh thất bại"));
                 }
@@ -147,7 +177,7 @@ public class CreatePostActivity extends AppCompatActivity {
         });
     }
 
-    private void executePost(String content, String userName, String imageUrl) {
+    private void executePost(String content, String userName, String imageUrl, String avatarUrl) {
         String postId = db.child("posts").push().getKey();
         if (postId == null) {
             onPostFailed("Lỗi tạo bài viết");
@@ -157,8 +187,9 @@ public class CreatePostActivity extends AppCompatActivity {
         Map<String, Object> data = new HashMap<>();
         data.put("postId", postId);
         data.put("userName", userName);
+        data.put("avatarUrl", avatarUrl);
         data.put("content", content);
-        data.put("imageUrl", imageUrl);   // URL Cloudinary hoặc "" nếu không có ảnh
+        data.put("imageUrl", imageUrl);
         data.put("timestamp", System.currentTimeMillis());
         data.put("likes", 0L);
         data.put("comments_count", 0L);

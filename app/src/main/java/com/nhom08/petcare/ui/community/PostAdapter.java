@@ -21,7 +21,7 @@ import java.util.List;
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder> {
 
     public static class PostItem {
-        public String postId, userName, content, imageUrl;
+        public String postId, userName, content, imageUrl, avatarUrl;
         public long timestamp, likes, comments_count;
         public boolean isLiked = false;
         public PostItem() {}
@@ -62,6 +62,17 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         holder.tvContent.setText(item.content);
         holder.tvLikeCount.setText(String.valueOf(item.likes));
         holder.tvCommentCount.setText(String.valueOf(item.comments_count));
+
+        // Load avatar người đăng
+        if (item.avatarUrl != null && !item.avatarUrl.isEmpty()) {
+            Glide.with(holder.itemView.getContext())
+                    .load(item.avatarUrl)
+                    .placeholder(R.drawable.pet_welcome)
+                    .circleCrop()
+                    .into(holder.imgAvatar);
+        } else {
+            holder.imgAvatar.setImageResource(R.drawable.pet_welcome);
+        }
 
         // Load ảnh bài đăng — hỗ trợ cả URL Cloudinary (https://) và File Internal
         if (item.imageUrl != null && !item.imageUrl.isEmpty()) {
@@ -119,7 +130,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     public int getItemCount() { return list.size(); }
 
     static class PostViewHolder extends RecyclerView.ViewHolder {
-        ImageView imgPost, imgHeart;
+        ImageView imgPost, imgHeart, imgAvatar;
         TextView tvUserName, tvContent, tvLikeCount, tvCommentCount;
         LinearLayout btnLike, btnComment;
 
@@ -127,6 +138,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
             super(v);
             imgPost        = v.findViewById(R.id.imgPost);
             imgHeart       = v.findViewById(R.id.imgHeart);
+            imgAvatar      = v.findViewById(R.id.imgAvatar);
             tvUserName     = v.findViewById(R.id.tvUserName);
             tvContent      = v.findViewById(R.id.tvContent);
             tvLikeCount    = v.findViewById(R.id.tvLikeCount);

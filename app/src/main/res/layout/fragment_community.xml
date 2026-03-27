@@ -54,6 +54,7 @@
                 android:layout_marginBottom="8dp">
 
                 <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/imgCurrentUserAvatar"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:src="@drawable/pet_welcome"
