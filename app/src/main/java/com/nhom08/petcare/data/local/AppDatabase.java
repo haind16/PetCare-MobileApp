@@ -20,7 +20,7 @@ import com.nhom08.petcare.data.model.*;
                 NhatKy.class,
                 HoSoYTe.class
         },
-        version = 1,
+        version = 2,
         exportSchema = false
 )
 public abstract class AppDatabase extends RoomDatabase {

@@ -47,34 +47,65 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <TextView
+                <!-- Tag Đơn thuốc -->
+                <LinearLayout
                     android:id="@+id/tvTagDonThuoc"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Đơn thuốc"
-                    android:textSize="11sp"
-                    android:textColor="@color/white"
-                    android:background="@drawable/bg_orange_btn"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_icon_blue"
                     android:paddingStart="8dp"
                     android:paddingEnd="8dp"
-                    android:paddingTop="2dp"
-                    android:paddingBottom="2dp"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp"
                     android:layout_marginEnd="6dp"
-                    android:visibility="gone"/>
+                    android:visibility="gone">
 
-                <TextView
+                    <ImageView
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:src="@drawable/ic_pill"
+                        android:tint="#1565C0"
+                        android:layout_marginEnd="4dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Đơn thuốc"
+                        android:textSize="11sp"
+                        android:textColor="#1565C0"/>
+                </LinearLayout>
+
+                <!-- Tag Tiêm phòng -->
+                <LinearLayout
                     android:id="@+id/tvTagTiemPhong"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Tiêm phòng"
-                    android:textSize="11sp"
-                    android:textColor="@color/white"
-                    android:background="@drawable/bg_interact_btn"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_icon_yellow"
                     android:paddingStart="8dp"
                     android:paddingEnd="8dp"
-                    android:paddingTop="2dp"
-                    android:paddingBottom="2dp"
-                    android:visibility="gone"/>
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:src="@drawable/ic_syringe"
+                        android:tint="#E65100"
+                        android:layout_marginEnd="4dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tiêm phòng"
+                        android:textSize="11sp"
+                        android:textColor="#E65100"/>
+                </LinearLayout>
+
             </LinearLayout>
         </LinearLayout>
 

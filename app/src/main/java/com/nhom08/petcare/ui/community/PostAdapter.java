@@ -16,7 +16,10 @@ import com.google.firebase.database.*;
 import com.nhom08.petcare.R;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder> {
@@ -63,6 +66,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         holder.tvContent.setText(item.content);
         holder.tvLikeCount.setText(String.valueOf(item.likes));
         holder.tvCommentCount.setText(String.valueOf(item.comments_count));
+        holder.tvTime.setText(formatTime(item.timestamp));
 
         // Load avatar người đăng
         if (item.avatarUrl != null && !item.avatarUrl.isEmpty()) {
@@ -139,7 +143,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
 
     static class PostViewHolder extends RecyclerView.ViewHolder {
         ImageView imgPost, imgHeart, imgAvatar;
-        TextView tvUserName, tvContent, tvLikeCount, tvCommentCount;
+        TextView tvUserName, tvContent, tvLikeCount, tvCommentCount, tvTime;
         LinearLayout btnLike, btnComment;
 
         PostViewHolder(View v) {
@@ -151,8 +155,23 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
             tvContent      = v.findViewById(R.id.tvContent);
             tvLikeCount    = v.findViewById(R.id.tvLikeCount);
             tvCommentCount = v.findViewById(R.id.tvCommentCount);
+            tvTime         = v.findViewById(R.id.tvTime);
             btnLike        = v.findViewById(R.id.btnLike);
             btnComment     = v.findViewById(R.id.layoutWriteComment);
         }
+    }
+
+    private String formatTime(long timestamp) {
+        if (timestamp == 0) return "";
+        long now  = System.currentTimeMillis();
+        long diff = now - timestamp;
+
+        if (diff < 60_000)                return "Vừa xong";
+        if (diff < 3_600_000)             return (diff / 60_000) + " phút trước";
+        if (diff < 86_400_000)            return (diff / 3_600_000) + " giờ trước";
+        if (diff < 7 * 86_400_000L)       return (diff / 86_400_000) + " ngày trước";
+
+        return new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                .format(new Date(timestamp));
     }
 }

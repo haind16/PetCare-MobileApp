@@ -17,7 +17,8 @@ public class HoSoYTe {
     public String phongKham;
     public String bacSi;
     public String chuanDoan;
-    public String donThuoc;     // text tổng hợp đơn thuốc
+    public String donThuoc;    // đơn thuốc
+    public String tiemPhong;   // thông tin tiêm phòng (field mới)
 
     public HoSoYTe() {}
 }

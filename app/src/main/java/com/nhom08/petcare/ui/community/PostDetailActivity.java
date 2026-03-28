@@ -15,6 +15,9 @@ import com.nhom08.petcare.R;
 import com.nhom08.petcare.databinding.ActivityPostDetailBinding;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class PostDetailActivity extends AppCompatActivity {
 
@@ -80,6 +83,10 @@ public class PostDetailActivity extends AppCompatActivity {
                 binding.tvLikeCount.setText(String.valueOf(likes != null ? likes : 0));
                 binding.tvCommentCount.setText(String.valueOf(cmts != null ? cmts : 0));
 
+                // Hiện thời gian đăng
+                Long ts = snapshot.child("timestamp").getValue(Long.class);
+                binding.tvTime.setText(ts != null ? formatTime(ts) : "");
+
                 // Load avatar
                 if (avatarUrl != null && !avatarUrl.isEmpty()) {
                     Glide.with(PostDetailActivity.this)
@@ -109,5 +116,18 @@ public class PostDetailActivity extends AppCompatActivity {
 
             @Override public void onCancelled(@NonNull DatabaseError error) {}
         });
+    }
+
+    private String formatTime(long timestamp) {
+        long now  = System.currentTimeMillis();
+        long diff = now - timestamp;
+
+        if (diff < 60_000)          return "Vừa xong";
+        if (diff < 3_600_000)       return (diff / 60_000) + " phút trước";
+        if (diff < 86_400_000)      return (diff / 3_600_000) + " giờ trước";
+        if (diff < 7 * 86_400_000L) return (diff / 86_400_000) + " ngày trước";
+
+        return new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                .format(new Date(timestamp));
     }
 }

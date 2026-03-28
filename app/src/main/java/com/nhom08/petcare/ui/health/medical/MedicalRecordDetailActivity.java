@@ -1,34 +1,114 @@
 package com.nhom08.petcare.ui.health.medical;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.bumptech.glide.Glide;
+import com.nhom08.petcare.R;
+import com.nhom08.petcare.data.repository.HoSoYTeRepository;
+import com.nhom08.petcare.data.repository.PetRepository;
 import com.nhom08.petcare.databinding.ActivityMedicalRecordDetailBinding;
+
+import java.io.File;
 
 public class MedicalRecordDetailActivity extends AppCompatActivity {
 
     private ActivityMedicalRecordDetailBinding binding;
+    private HoSoYTeRepository hoSoRepo;
+    private PetRepository petRepo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityMedicalRecordDetailBinding.inflate(
-                getLayoutInflater());
+        binding = ActivityMedicalRecordDetailBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        hoSoRepo = new HoSoYTeRepository(this);
+        petRepo  = new PetRepository(this);
 
         binding.btnBack.setOnClickListener(v -> finish());
 
-        // Data mẫu — sau lấy từ Intent/Firestore
-        binding.tvPetName.setText("Milo");
-        binding.tvPetAge.setText("Tuổi: 3");
-        binding.tvPetWeight.setText("Cân nặng: 4.5 kg");
-        binding.tvDate.setText("Ngày khám: 25/12/2025");
-        binding.tvType.setText("Loại khám: Khám sức khỏe định kì");
-        binding.tvClinic.setText("Phòng khám: Happy Pet Clinic");
-        binding.tvDoctor.setText("Bác sĩ: Trần Văn B");
-        binding.tvDiagnosis.setText("Viêm tai nhẹ do vi khuẩn");
-        binding.tvMedicine1Name.setText("Amoxicillin 250mg");
-        binding.tvMedicine1Dosage.setText("Ngày 2 lần - 7 ngày");
-        binding.tvMedicine2Name.setText("Thuốc nhỏ tai Oticin-10");
-        binding.tvMedicine2Dosage.setText("Mỗi bên tai 1 giọt - 7 ngày");
+        String recordId = getIntent().getStringExtra("record_id");
+        if (recordId == null) {
+            Toast.makeText(this, "Không tìm thấy hồ sơ", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+        loadRecord(recordId);
     }
+
+    private void loadRecord(String recordId) {
+        hoSoRepo.getById(recordId, record -> runOnUiThread(() -> {
+            if (record == null) {
+                Toast.makeText(this, "Hồ sơ không tồn tại", Toast.LENGTH_SHORT).show();
+                finish();
+                return;
+            }
+
+            // Thông tin khám
+            binding.tvDate.setText("Ngày khám: "   + nvl(record.ngayKham));
+            binding.tvType.setText("Loại khám: "   + nvl(record.loaiKham));
+            binding.tvClinic.setText("Phòng khám: " + nvl(record.phongKham));
+            binding.tvDoctor.setText("Bác sĩ: "     + nvl(record.bacSi));
+            binding.tvDiagnosis.setText(nvl(record.chuanDoan));
+
+            boolean hasDonThuoc  = record.donThuoc  != null && !record.donThuoc.isEmpty();
+            boolean hasTiemPhong = record.tiemPhong != null && !record.tiemPhong.isEmpty();
+
+            // Item 1 — Đơn thuốc
+            if (hasDonThuoc) {
+                binding.tvMedicine1Name.setText(record.donThuoc);
+                binding.tvMedicine1Dosage.setVisibility(View.GONE);
+            } else {
+                binding.tvMedicine1Name.setText("Không có đơn thuốc");
+                binding.tvMedicine1Dosage.setVisibility(View.GONE);
+            }
+
+            // Item 2 — Tiêm phòng
+            if (hasTiemPhong) {
+                binding.tvMedicine2Name.setText(record.tiemPhong);
+                binding.tvMedicine2Name.setVisibility(View.VISIBLE);
+                binding.tvMedicine2Dosage.setVisibility(View.GONE);
+            } else {
+                binding.tvMedicine2Name.setText("Không có tiêm phòng");
+                binding.tvMedicine2Name.setVisibility(View.VISIBLE);
+                binding.tvMedicine2Dosage.setVisibility(View.GONE);
+            }
+
+            loadPetInfo(record.petId);
+        }));
+    }
+
+    private void loadPetInfo(String petId) {
+        if (petId == null) return;
+        petRepo.getPetById(petId, pet -> runOnUiThread(() -> {
+            if (pet == null) return;
+            binding.tvPetName.setText(nvl(pet.tenThuCung));
+            binding.tvPetAge.setText(
+                    pet.ngaySinh != null && !pet.ngaySinh.isEmpty()
+                            ? "Ngày sinh: " + pet.ngaySinh
+                            : "Ngày sinh: Chưa có");
+            binding.tvPetWeight.setText(
+                    pet.canNang > 0
+                            ? "Cân nặng: " + pet.canNang + " kg"
+                            : "Cân nặng: Chưa có");
+
+            // Load ảnh thú cưng
+            if (pet.anhUrl != null && !pet.anhUrl.isEmpty()) {
+                Glide.with(this)
+                        .load(new File(pet.anhUrl))
+                        .placeholder(R.drawable.pet_welcome)
+                        .circleCrop()
+                        .into(binding.imgPet);
+            } else {
+                binding.imgPet.setImageResource(R.drawable.pet_welcome);
+            }
+        }));
+    }
+
+    private String nvl(String s) { return s != null ? s : ""; }
 }
