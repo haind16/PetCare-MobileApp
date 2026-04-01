@@ -21,4 +21,7 @@ public interface ThuCungDao {
 
     @Query("DELETE FROM thu_cung WHERE id = :id")
     void deleteById(String id);
+
+    @Query("UPDATE thu_cung SET canNang = :canNang WHERE id = :petId")
+    void updateCanNang(String petId, float canNang);
 }

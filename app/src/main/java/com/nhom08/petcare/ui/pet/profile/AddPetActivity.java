@@ -10,12 +10,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.nhom08.petcare.R;
+import com.nhom08.petcare.data.local.AppDatabase;
+import com.nhom08.petcare.data.model.CanNang;
 import com.nhom08.petcare.data.model.ThuCung;
 import com.nhom08.petcare.data.repository.PetRepository;
 import com.nhom08.petcare.databinding.ActivityAddPetBinding;
+import com.nhom08.petcare.utils.PetManager;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.util.UUID;
 
 public class AddPetActivity extends AppCompatActivity {
 
@@ -105,8 +110,27 @@ public class AddPetActivity extends AppCompatActivity {
         pet.anhUrl     = savedImagePath;
 
         repository.addPet(pet, result -> runOnUiThread(() -> {
+            // Nếu có nhập cân nặng → tạo bản ghi can_nang
+            if (pet.canNang > 0) {
+                new Thread(() -> {
+                    CanNang cn = new CanNang();
+                    cn.id = UUID.randomUUID().toString();
+                    cn.petId = pet.id;
+                    cn.canNang = pet.canNang;
+                    // Lấy ngày hôm nay làm ngày đo
+                    cn.ngay = new java.text.SimpleDateFormat(
+                            "dd/MM/yyyy", java.util.Locale.getDefault()
+                    ).format(new java.util.Date());
+                    AppDatabase.getInstance(this).canNangDao().insert(cn);
+                }).start();
+            }
+
+            PetManager.getInstance(this).setCurrentPet(pet.id, pet.tenThuCung, pet.anhUrl);
+
             Toast.makeText(this, "Đã thêm thú cưng thành công!", Toast.LENGTH_SHORT).show();
             finish();
         }));
     }
+
+
 }

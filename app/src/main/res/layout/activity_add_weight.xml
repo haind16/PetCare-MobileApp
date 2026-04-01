@@ -58,7 +58,7 @@
             android:layout_marginBottom="24dp"
             android:background="@drawable/edit_text_border"
             android:paddingStart="16dp"
-            android:hint="6 kg"
+            android:hint="Vui lòng nhập cân nặng"
             android:inputType="numberDecimal"
             android:textSize="16sp"/>
 

@@ -45,7 +45,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tên thực phẩm gây dị ứng"
+            android:text="Tên thực phẩm / chất gây dị ứng"
             android:textSize="14sp"
             android:textColor="#333333"
             android:layout_marginBottom="8dp"/>
@@ -55,29 +55,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/edit_text_border"
-            android:gravity="top"
-            android:hint="Nhập tên thực phẩm gây dị ứng"
-            android:inputType="textMultiLine"
-            android:padding="12dp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Ghi chú"
-            android:textSize="14sp"
-            android:textColor="#333333"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp"/>
-
-        <EditText
-            android:id="@+id/etNote"
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:background="@drawable/edit_text_border"
-            android:padding="12dp"
-            android:hint="Nhập ghi chú..."
-            android:gravity="top"
-            android:inputType="textMultiLine"/>
+            android:hint="VD: Hành lá, đậu phộng..."
+            android:inputType="text"
+            android:padding="12dp"/>
 
     </LinearLayout>
 

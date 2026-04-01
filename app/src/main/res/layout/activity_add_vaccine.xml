@@ -5,7 +5,6 @@
     android:orientation="vertical"
     android:background="@color/white">
 
-    <!-- Header -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="56dp"
@@ -29,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="Thêm lịch mới"
+            android:text="Thêm lịch tiêm"
             android:textColor="@color/white"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -47,11 +46,10 @@
             android:orientation="vertical"
             android:padding="24dp">
 
-            <!-- Loại Vaccine -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Loại Vaccine:"
+                android:text="Loại Vaccine"
                 android:textSize="14sp"
                 android:textColor="#333333"
                 android:layout_marginBottom="8dp"/>
@@ -65,18 +63,32 @@
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"/>
 
-            <!-- Ngày tiêm -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Ngày tiêm:"
+                android:text="Ngày tiêm"
                 android:textSize="14sp"
                 android:textColor="#333333"
                 android:layout_marginBottom="8dp"/>
 
-            <!-- DatePicker kiểu scroll -->
             <DatePicker
                 android:id="@+id/datePicker"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:datePickerMode="spinner"
+                android:calendarViewShown="false"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ngày nhắc lịch tiêm tiếp theo"
+                android:textSize="14sp"
+                android:textColor="#333333"
+                android:layout_marginBottom="8dp"/>
+
+            <DatePicker
+                android:id="@+id/datePickerReminder"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:datePickerMode="spinner"
@@ -85,7 +97,6 @@
         </LinearLayout>
     </ScrollView>
 
-    <!-- Nút Lưu -->
     <Button
         android:id="@+id/btnSave"
         android:layout_width="match_parent"

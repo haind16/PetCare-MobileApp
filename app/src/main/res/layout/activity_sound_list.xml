@@ -59,13 +59,12 @@
                 android:padding="12dp"
                 android:gravity="center_vertical">
 
-                <TextView
+                <ImageView
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:background="@drawable/bg_icon_blue"
-                    android:gravity="center"
-                    android:text="🐕"
-                    android:textSize="22sp"/>
+                    android:padding="8dp"
+                    android:src="@drawable/ic_dog" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -94,13 +93,12 @@
                 android:padding="12dp"
                 android:gravity="center_vertical">
 
-                <TextView
+                <ImageView
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:background="@drawable/bg_icon_pink"
-                    android:gravity="center"
-                    android:text="🐈"
-                    android:textSize="22sp"/>
+                    android:padding="8dp"
+                    android:src="@drawable/ic_cat" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -129,13 +127,12 @@
                 android:padding="12dp"
                 android:gravity="center_vertical">
 
-                <TextView
+                <ImageView
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:background="@drawable/bg_icon_yellow"
-                    android:gravity="center"
-                    android:text="🐦"
-                    android:textSize="22sp"/>
+                    android:padding="8dp"
+                    android:src="@drawable/ic_bird" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -164,13 +161,12 @@
                 android:padding="12dp"
                 android:gravity="center_vertical">
 
-                <TextView
+                <ImageView
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:background="@drawable/bg_icon_blue"
-                    android:gravity="center"
-                    android:text="🎵"
-                    android:textSize="22sp"/>
+                    android:padding="8dp"
+                    android:src="@drawable/ic_music" />
 
                 <TextView
                     android:layout_width="wrap_content"

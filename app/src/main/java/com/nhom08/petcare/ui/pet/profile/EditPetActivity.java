@@ -9,6 +9,8 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import com.bumptech.glide.Glide;
 import com.nhom08.petcare.R;
+import com.nhom08.petcare.data.local.AppDatabase;
+import com.nhom08.petcare.data.model.CanNang;
 import com.nhom08.petcare.data.model.ThuCung;
 import com.nhom08.petcare.data.repository.PetRepository;
 import com.nhom08.petcare.databinding.ActivityEditPetBinding;
@@ -16,6 +18,7 @@ import com.nhom08.petcare.utils.PetManager;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.util.UUID;
 
 public class EditPetActivity extends AppCompatActivity {
 
@@ -109,6 +112,20 @@ public class EditPetActivity extends AppCompatActivity {
         if (savedImagePath != null) currentPet.anhUrl = savedImagePath;
 
         repository.updatePet(currentPet, result -> runOnUiThread(() -> {
+
+            if (currentPet.canNang > 0) {
+                new Thread(() -> {
+                    CanNang cn = new CanNang();
+                    cn.id = UUID.randomUUID().toString();
+                    cn.petId = currentPet.id;
+                    cn.canNang = currentPet.canNang;
+                    cn.ngay = new java.text.SimpleDateFormat(
+                            "dd/MM/yyyy", java.util.Locale.getDefault()
+                    ).format(new java.util.Date());
+                    AppDatabase.getInstance(this).canNangDao().insert(cn);
+                }).start();
+            }
+
             PetManager pm = PetManager.getInstance(this);
             if (currentPet.id.equals(pm.getCurrentPetId())) {
                 pm.setCurrentPet(currentPet.id, currentPet.tenThuCung, currentPet.anhUrl != null ? currentPet.anhUrl : "");
