@@ -214,6 +214,14 @@
         </LinearLayout>
     </ScrollView>
 
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"/>
+
     <Button
         android:id="@+id/btnSave"
         android:layout_width="match_parent"
@@ -225,5 +233,6 @@
         android:textSize="16sp"
         android:textAllCaps="false"
         android:textStyle="bold"/>
+
 
 </LinearLayout>

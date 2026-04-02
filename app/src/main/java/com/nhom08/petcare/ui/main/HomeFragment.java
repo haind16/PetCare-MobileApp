@@ -100,11 +100,19 @@ public class HomeFragment extends Fragment {
                         : "Cân nặng: Chưa có");
 
                 if (pet.anhUrl != null && !pet.anhUrl.isEmpty()) {
-                    Glide.with(requireContext())
-                            .load(new File(pet.anhUrl))
-                            .circleCrop()
-                            .placeholder(R.drawable.pet_welcome)
-                            .into(binding.imgPet);
+                    if (pet.anhUrl.startsWith("http")) {
+                        Glide.with(requireContext())
+                                .load(pet.anhUrl)
+                                .circleCrop()
+                                .placeholder(R.drawable.pet_welcome)
+                                .into(binding.imgPet);
+                    } else {
+                        Glide.with(requireContext())
+                                .load(new File(pet.anhUrl))
+                                .circleCrop()
+                                .placeholder(R.drawable.pet_welcome)
+                                .into(binding.imgPet);
+                    }
                 } else {
                     binding.imgPet.setImageResource(R.drawable.pet_welcome);
                 }

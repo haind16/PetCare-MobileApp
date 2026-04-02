@@ -60,12 +60,19 @@ public class PetAdapter extends RecyclerView.Adapter<PetAdapter.PetViewHolder> {
 
         // Load ảnh từ File Internal
         if (pet.anhUrl != null && !pet.anhUrl.isEmpty()) {
-            Glide.with(holder.itemView.getContext())
-                    .load(new File(pet.anhUrl))
-                    .circleCrop()
-                    .placeholder(R.drawable.pet_welcome)
-                    .error(R.drawable.pet_welcome)
-                    .into(holder.imgPet);
+            if (pet.anhUrl.startsWith("http")) {
+                Glide.with(holder.itemView.getContext())
+                        .load(pet.anhUrl)
+                        .circleCrop() // hoặc centerCrop tùy ý bạn
+                        .placeholder(R.drawable.pet_welcome)
+                        .into(holder.imgPet); // đổi tên biến imgPet cho khớp với code của bạn
+            } else {
+                Glide.with(holder.itemView.getContext())
+                        .load(new File(pet.anhUrl))
+                        .circleCrop()
+                        .placeholder(R.drawable.pet_welcome)
+                        .into(holder.imgPet);
+            }
         } else {
             holder.imgPet.setImageResource(R.drawable.pet_welcome);
         }

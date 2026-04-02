@@ -66,14 +66,19 @@ public class PetSelectorAdapter extends
         holder.tvPetName.setText(item.petName);
         holder.tvPetType.setText(item.petType);
 
-        // Load ảnh từ File Internal
+        // Đổi pet.anhUrl thành item.anhUrl
         if (item.anhUrl != null && !item.anhUrl.isEmpty()) {
-            Glide.with(holder.itemView.getContext())
-                    .load(new File(item.anhUrl))
-                    .circleCrop()
-                    .placeholder(R.drawable.pet_welcome)
-                    .error(R.drawable.pet_welcome)
-                    .into(holder.imgPet);
+            if (item.anhUrl.startsWith("http")) {
+                Glide.with(holder.itemView.getContext())
+                        .load(item.anhUrl)
+                        .placeholder(R.drawable.pet_welcome)
+                        .into(holder.imgPet);
+            } else {
+                Glide.with(holder.itemView.getContext())
+                        .load(new File(item.anhUrl))
+                        .placeholder(R.drawable.pet_welcome)
+                        .into(holder.imgPet);
+            }
         } else {
             holder.imgPet.setImageResource(R.drawable.pet_welcome);
         }
@@ -89,7 +94,7 @@ public class PetSelectorAdapter extends
             selectedPosition = holder.getAdapterPosition();
             notifyItemChanged(prev);
             notifyItemChanged(selectedPosition);
-            // Lấy item theo selectedPosition hiện tại, không dùng item cũ từ closure
+            // Lấy item theo selectedPosition hiện tại
             if (listener != null) listener.onSelected(list.get(selectedPosition));
         });
     }

@@ -45,6 +45,7 @@
             android:orientation="vertical"
             android:padding="16dp">
 
+            <!-- Card thông tin cơ bản -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -77,7 +78,6 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:layout_marginStart="12dp"
-                            android:text="Cz"
                             android:textSize="18sp"
                             android:textStyle="bold"/>
 
@@ -95,69 +95,25 @@
                         android:layout_height="wrap_content"
                         android:orientation="horizontal">
 
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Giới tính"
-                                android:textSize="11sp"
-                                android:textColor="#888888"/>
-                            <TextView
-                                android:id="@+id/tvPetGender"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Male"
-                                android:textSize="14sp"
-                                android:textStyle="bold"/>
+                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Giới tính" android:textSize="11sp" android:textColor="#888888"/>
+                            <TextView android:id="@+id/tvPetGender" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="14sp" android:textStyle="bold"/>
                         </LinearLayout>
 
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Tuổi"
-                                android:textSize="11sp"
-                                android:textColor="#888888"/>
-                            <TextView
-                                android:id="@+id/tvPetAge"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="5 tuổi"
-                                android:textSize="14sp"
-                                android:textStyle="bold"/>
+                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Tuổi" android:textSize="11sp" android:textColor="#888888"/>
+                            <TextView android:id="@+id/tvPetAge" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="14sp" android:textStyle="bold"/>
                         </LinearLayout>
 
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Giống"
-                                android:textSize="11sp"
-                                android:textColor="#888888"/>
-                            <TextView
-                                android:id="@+id/tvPetBreed"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Hoody"
-                                android:textSize="14sp"
-                                android:textStyle="bold"/>
+                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Giống" android:textSize="11sp" android:textColor="#888888"/>
+                            <TextView android:id="@+id/tvPetBreed" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="14sp" android:textStyle="bold"/>
                         </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
+            <!-- Cân nặng -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/btnWeight"
                 android:layout_width="match_parent"
@@ -165,31 +121,15 @@
                 app:cardCornerRadius="10dp"
                 app:cardElevation="1dp"
                 android:layout_marginBottom="8dp">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp">
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_weight" />
+                <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="horizontal" android:gravity="center_vertical" android:paddingStart="16dp" android:paddingEnd="16dp">
+                    <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_weight"/>
                     <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="12dp" android:text="Cân nặng" android:textSize="15sp"/>
-
-                    <TextView
-                        android:id="@+id/tvPetWeight"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="4.5kg"
-                        android:textSize="13sp"
-                        android:textColor="@color/primary_blue"/>
-
+                    <TextView android:id="@+id/tvPetWeight" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="13sp" android:textColor="@color/primary_blue"/>
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=" ›" android:textSize="18sp" android:textColor="#888888"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
+            <!-- Lịch tiêm phòng -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/btnVaccine"
                 android:layout_width="match_parent"
@@ -197,23 +137,15 @@
                 app:cardCornerRadius="10dp"
                 app:cardElevation="1dp"
                 android:layout_marginBottom="8dp">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp">
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_syringe" />
+                <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="horizontal" android:gravity="center_vertical" android:paddingStart="16dp" android:paddingEnd="16dp">
+                    <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_syringe"/>
                     <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="12dp" android:text="Lịch tiêm phòng" android:textSize="15sp"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="23/6/2025" android:textSize="13sp" android:textColor="@color/primary_blue"/>
+                    <TextView android:id="@+id/tvVaccineSummary" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="13sp" android:textColor="#888888"/>
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=" ›" android:textSize="18sp" android:textColor="#888888"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
+            <!-- Tẩy giun -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/btnDeworming"
                 android:layout_width="match_parent"
@@ -221,23 +153,15 @@
                 app:cardCornerRadius="10dp"
                 app:cardElevation="1dp"
                 android:layout_marginBottom="8dp">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp">
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_worm" />
+                <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="horizontal" android:gravity="center_vertical" android:paddingStart="16dp" android:paddingEnd="16dp">
+                    <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_worm"/>
                     <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="12dp" android:text="Ngày tẩy giun" android:textSize="15sp"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="19/3/2026" android:textSize="13sp" android:textColor="@color/primary_blue"/>
+                    <TextView android:id="@+id/tvDewormingSummary" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="13sp" android:textColor="#888888"/>
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=" ›" android:textSize="18sp" android:textColor="#888888"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
+            <!-- Dị ứng -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/btnAllergy"
                 android:layout_width="match_parent"
@@ -245,23 +169,15 @@
                 app:cardCornerRadius="10dp"
                 app:cardElevation="1dp"
                 android:layout_marginBottom="8dp">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp">
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_warning" />
+                <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="horizontal" android:gravity="center_vertical" android:paddingStart="16dp" android:paddingEnd="16dp">
+                    <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_warning"/>
                     <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="12dp" android:text="Dị ứng" android:textSize="15sp"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Hành lá" android:textSize="13sp" android:textColor="@color/primary_blue"/>
+                    <TextView android:id="@+id/tvAllergySummary" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="13sp" android:textColor="#888888"/>
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=" ›" android:textSize="18sp" android:textColor="#888888"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
+            <!-- Bệnh nền -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/btnDisease"
                 android:layout_width="match_parent"
@@ -269,23 +185,15 @@
                 app:cardCornerRadius="10dp"
                 app:cardElevation="1dp"
                 android:layout_marginBottom="8dp">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp">
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_hospital" />
+                <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="horizontal" android:gravity="center_vertical" android:paddingStart="16dp" android:paddingEnd="16dp">
+                    <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_hospital"/>
                     <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="12dp" android:text="Bệnh nền" android:textSize="15sp"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="(Chưa có)" android:textSize="13sp" android:textColor="#888888"/>
+                    <TextView android:id="@+id/tvDiseaseSummary" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="13sp" android:textColor="#888888"/>
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=" ›" android:textSize="18sp" android:textColor="#888888"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
+            <!-- Đơn thuốc -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/btnPrescription"
                 android:layout_width="match_parent"
@@ -293,23 +201,13 @@
                 app:cardCornerRadius="10dp"
                 app:cardElevation="1dp"
                 android:layout_marginBottom="8dp">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp">
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_pill" />
+                <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="horizontal" android:gravity="center_vertical" android:paddingStart="16dp" android:paddingEnd="16dp">
+                    <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_pill"/>
                     <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="12dp" android:text="Đơn thuốc" android:textSize="15sp"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="(Chưa có)" android:textSize="13sp" android:textColor="#888888"/>
+                    <TextView android:id="@+id/tvPrescriptionSummary" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="13sp" android:textColor="#888888"/>
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=" ›" android:textSize="18sp" android:textColor="#888888"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
-
 
         </LinearLayout>
     </ScrollView>

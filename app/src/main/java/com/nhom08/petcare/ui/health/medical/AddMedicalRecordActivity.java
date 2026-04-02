@@ -3,14 +3,11 @@ package com.nhom08.petcare.ui.health.medical;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.nhom08.petcare.data.model.HoSoYTe;
 import com.nhom08.petcare.data.repository.HoSoYTeRepository;
 import com.nhom08.petcare.databinding.ActivityAddMedicalRecordBinding;
 import com.nhom08.petcare.utils.PetManager;
-
 import java.util.Calendar;
 
 public class AddMedicalRecordActivity extends AppCompatActivity {
@@ -26,64 +23,74 @@ public class AddMedicalRecordActivity extends AppCompatActivity {
         binding = ActivityAddMedicalRecordBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        repo  = new HoSoYTeRepository(this);
-        petId = PetManager.getInstance(this).getCurrentPetId();
+        repo = new HoSoYTeRepository(this);
+
+        // Ưu tiên pet_id từ Intent, fallback về PetManager
+        petId = getIntent().getStringExtra("pet_id");
+        if (petId == null || petId.isEmpty()) {
+            petId = PetManager.getInstance(this).getCurrentPetId();
+        }
 
         binding.btnBack.setOnClickListener(v -> finish());
 
         // Hiện ngày mặc định
-        int d = selectedDate.get(Calendar.DAY_OF_MONTH);
-        int m = selectedDate.get(Calendar.MONTH) + 1;
-        int y = selectedDate.get(Calendar.YEAR);
-        binding.tvSelectedDate.setText(d + "/" + m + "/" + y);
+        updateDateText();
 
         // Chọn ngày khám
         binding.btnSelectDate.setOnClickListener(v ->
                 new DatePickerDialog(this, (view, year, month, day) -> {
                     selectedDate.set(year, month, day);
-                    binding.tvSelectedDate.setText(
-                            day + "/" + (month + 1) + "/" + year);
+                    updateDateText();
                 },
                         selectedDate.get(Calendar.YEAR),
                         selectedDate.get(Calendar.MONTH),
                         selectedDate.get(Calendar.DAY_OF_MONTH)).show()
         );
 
-        // Lưu
-        binding.btnSave.setOnClickListener(v -> {
-            String loaiKham  = binding.etType.getText().toString().trim();
-            String phongKham = binding.etClinic.getText().toString().trim();
-            String bacSi     = binding.etDoctor.getText().toString().trim();
-            String chuanDoan = binding.etDiagnosis.getText().toString().trim();
-            String donThuoc  = binding.etPrescription.getText().toString().trim();
-            String tiemPhong = binding.etVaccine.getText().toString().trim();
-            String ngayKham  = binding.tvSelectedDate.getText().toString();
+        binding.btnSave.setOnClickListener(v -> saveRecord());
+    }
 
-            if (loaiKham.isEmpty()) {
-                binding.etType.setError("Vui lòng nhập loại khám");
-                return;
-            }
+    private void updateDateText() {
+        int d = selectedDate.get(Calendar.DAY_OF_MONTH);
+        int m = selectedDate.get(Calendar.MONTH) + 1;
+        int y = selectedDate.get(Calendar.YEAR);
+        binding.tvSelectedDate.setText(
+                String.format("%d/%d/%d", d, m, y));
+    }
 
-            if (petId == null || petId.isEmpty()) {
-                Toast.makeText(this, "Chưa chọn thú cưng", Toast.LENGTH_SHORT).show();
-                return;
-            }
+    private void saveRecord() {
+        String loaiKham  = binding.etType.getText().toString().trim();
+        String phongKham = binding.etClinic.getText().toString().trim();
+        String bacSi     = binding.etDoctor.getText().toString().trim();
+        String chuanDoan = binding.etDiagnosis.getText().toString().trim();
+        String donThuoc  = binding.etPrescription.getText().toString().trim();
+        String tiemPhong = binding.etVaccine.getText().toString().trim();
+        String ngayKham  = binding.tvSelectedDate.getText().toString();
 
-            HoSoYTe record = new HoSoYTe();
-            record.petId     = petId;
-            record.ngayKham  = ngayKham;
-            record.loaiKham  = loaiKham;
-            record.phongKham = phongKham;
-            record.bacSi     = bacSi;
-            record.chuanDoan = chuanDoan;
-            record.donThuoc  = donThuoc;
-            record.tiemPhong = tiemPhong;
+        if (loaiKham.isEmpty()) {
+            binding.etType.setError("Vui lòng nhập loại khám");
+            return;
+        }
 
-            binding.btnSave.setEnabled(false);
-            repo.add(record, r -> runOnUiThread(() -> {
-                Toast.makeText(this, "Đã lưu hồ sơ!", Toast.LENGTH_SHORT).show();
-                finish();
-            }));
-        });
+        if (petId == null || petId.isEmpty()) {
+            Toast.makeText(this, "Chưa chọn thú cưng", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        HoSoYTe record = new HoSoYTe();
+        record.petId     = petId;
+        record.ngayKham  = ngayKham;
+        record.loaiKham  = loaiKham;
+        record.phongKham = phongKham.isEmpty() ? null : phongKham;
+        record.bacSi     = bacSi.isEmpty() ? null : bacSi;
+        record.chuanDoan = chuanDoan.isEmpty() ? null : chuanDoan;
+        record.donThuoc  = donThuoc.isEmpty() ? null : donThuoc;
+        record.tiemPhong = tiemPhong.isEmpty() ? null : tiemPhong;
+
+        binding.btnSave.setEnabled(false);
+        repo.add(record, r -> runOnUiThread(() -> {
+            Toast.makeText(this, "Đã lưu hồ sơ!", Toast.LENGTH_SHORT).show();
+            finish();
+        }));
     }
 }
