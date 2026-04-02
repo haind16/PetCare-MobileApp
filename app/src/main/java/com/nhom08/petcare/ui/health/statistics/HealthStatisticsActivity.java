@@ -2,7 +2,9 @@ package com.nhom08.petcare.ui.health.statistics;
 
 import android.content.Intent;
 import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
@@ -18,14 +20,13 @@ import com.nhom08.petcare.ui.pet.health.WeightActivity;
 import com.nhom08.petcare.ui.health.diary.DiaryActivity;
 import com.nhom08.petcare.utils.PetManager;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 public class HealthStatisticsActivity extends AppCompatActivity {
 
@@ -72,18 +73,13 @@ public class HealthStatisticsActivity extends AppCompatActivity {
                 SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
                 Collections.sort(records, (c1, c2) -> {
                     try {
-                        Date date1 = sdf.parse(c1.ngay);
-                        Date date2 = sdf.parse(c2.ngay);
-                        if (date1 != null && date2 != null) {
-                            return date1.compareTo(date2); // Sắp xếp tăng dần (Cũ -> Mới)
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                        Date d1 = sdf.parse(c1.ngay);
+                        Date d2 = sdf.parse(c2.ngay);
+                        if (d1 != null && d2 != null) return d1.compareTo(d2);
+                    } catch (Exception e) { e.printStackTrace(); }
                     return 0;
                 });
 
-                // Lấy tối đa 12 bản ghi mới nhất
                 int start = Math.max(0, records.size() - 12);
                 List<CanNang> recent = records.subList(start, records.size());
 
@@ -96,17 +92,14 @@ public class HealthStatisticsActivity extends AppCompatActivity {
                             ? ngay.substring(0, 5) : ngay);
                 }
 
-                // Cập nhật text thay đổi cân nặng
                 if (recent.size() >= 2) {
                     float first = recent.get(0).canNang;
                     float last  = recent.get(recent.size() - 1).canNang;
                     float diff  = last - first;
                     String sign = diff >= 0 ? "+" : "";
-                    binding.tvWeightChange.setText(sign + diff + " kg");
-                    binding.tvWeightChange.setTextColor(
-                            diff >= 0 ? 0xFF4CAF50 : 0xFFF44336); // xanh tăng, đỏ giảm
-                    binding.tvWeightDate.setText(
-                            recent.get(0).ngay + " → " + recent.get(recent.size() - 1).ngay);
+                    binding.tvWeightChange.setText(sign + String.format(Locale.getDefault(), "%.1f", diff) + " kg");
+                    binding.tvWeightChange.setTextColor(diff >= 0 ? 0xFF4CAF50 : 0xFFF44336);
+                    binding.tvWeightDate.setText(recent.get(0).ngay + " → " + recent.get(recent.size() - 1).ngay);
                 } else {
                     binding.tvWeightChange.setText(recent.get(0).canNang + " kg");
                     binding.tvWeightDate.setText(recent.get(0).ngay);
@@ -128,8 +121,6 @@ public class HealthStatisticsActivity extends AppCompatActivity {
         dataSet.setDrawValues(true);
         dataSet.setValueTextSize(9f);
         dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
-
-        // Fill gradient nhẹ bên dưới đường
         dataSet.setDrawFilled(true);
         dataSet.setFillColor(0xFF4FC3F7);
         dataSet.setFillAlpha(30);
@@ -160,7 +151,7 @@ public class HealthStatisticsActivity extends AppCompatActivity {
         binding.tvWeightDate.setText("Chưa có dữ liệu");
     }
 
-    // ── BIỂU ĐỒ HOẠT ĐỘNG ────────────────────────────────────────────────────
+    // ── BIỂU ĐỒ HOẠT ĐỘNG TRONG TUẦN ────────────────────────────────────────
 
     private void loadActivityChart() {
         if (petId == null) { setupEmptyBarChart(); return; }
@@ -170,14 +161,29 @@ public class HealthStatisticsActivity extends AppCompatActivity {
             runOnUiThread(() -> {
                 if (allDiary.isEmpty()) { setupEmptyBarChart(); return; }
 
-                // Đếm số bản ghi nhật ký theo thứ trong tuần
-                // NhatKy.ngay format dd/MM/yyyy → parse thứ
+                // Tìm T2 đầu tuần hiện tại
+                Calendar today = Calendar.getInstance();
+                Calendar monday = (Calendar) today.clone();
+                monday.set(Calendar.HOUR_OF_DAY, 0);
+                monday.set(Calendar.MINUTE, 0);
+                monday.set(Calendar.SECOND, 0);
+                monday.set(Calendar.MILLISECOND, 0);
+
+                // DAY_OF_WEEK: CN=1, T2=2, T3=3...T7=7
+                int dow = monday.get(Calendar.DAY_OF_WEEK);
+                if (dow == Calendar.SUNDAY) {
+                    monday.add(Calendar.DAY_OF_MONTH, -6); // CN → lùi 6 ngày về T2
+                } else {
+                    monday.add(Calendar.DAY_OF_MONTH, -(dow - Calendar.MONDAY)); // T2-T7 → lùi về T2
+                }
+
+                // Tạo mảng đếm T2→CN
                 String[] dayLabels = {"T2", "T3", "T4", "T5", "T6", "T7", "CN"};
                 float[] counts = new float[7];
 
                 for (NhatKy nk : allDiary) {
-                    int dow = getDayOfWeek(nk.ngay); // 0=T2 ... 6=CN
-                    if (dow >= 0) counts[dow]++;
+                    int idx = getDayIndexInWeek(nk.ngay, monday);
+                    if (idx >= 0 && idx < 7) counts[idx]++;
                 }
 
                 List<BarEntry> entries = new ArrayList<>();
@@ -198,7 +204,8 @@ public class HealthStatisticsActivity extends AppCompatActivity {
         colors.add(0xFF5C6BC0); colors.add(0xFF7E57C2); colors.add(0xFF9575CD);
         colors.add(0xFFB39DDB);
         dataSet.setColors(colors);
-        dataSet.setDrawValues(false);
+        dataSet.setDrawValues(true);
+        dataSet.setValueTextSize(9f);
 
         chart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(labels));
         chart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
@@ -224,20 +231,49 @@ public class HealthStatisticsActivity extends AppCompatActivity {
         chart.invalidate();
     }
 
-    // ── HELPER: lấy thứ từ chuỗi dd/MM/yyyy ─────────────────────────────────
-
-    private int getDayOfWeek(String ngay) {
-        if (ngay == null || ngay.length() < 10) return -1;
+    /**
+     * Lấy index ngày trong tuần (0=T2 ... 6=CN) từ chuỗi ngay của NhatKy.
+     * Hỗ trợ 2 format:
+     *   - "dd/MM/yyyy"
+     *   - "Vào Thứ X, ngày D tháng M năm Y"
+     */
+    private int getDayIndexInWeek(String ngay, Calendar monday) {
+        if (ngay == null || ngay.isEmpty()) return -1;
         try {
-            String[] parts = ngay.split("/");
-            int day   = Integer.parseInt(parts[0]);
-            int month = Integer.parseInt(parts[1]) - 1;
-            int year  = Integer.parseInt(parts[2]);
-            java.util.Calendar cal = java.util.Calendar.getInstance();
-            cal.set(year, month, day);
-            // Calendar.DAY_OF_WEEK: 1=CN,2=T2...7=T7 → map sang 0=T2...6=CN
-            int dow = cal.get(java.util.Calendar.DAY_OF_WEEK);
-            return dow == java.util.Calendar.SUNDAY ? 6 : dow - 2;
-        } catch (Exception e) { return -1; }
+            Calendar cal = Calendar.getInstance();
+
+            if (ngay.contains("/")) {
+                // Format dd/MM/yyyy
+                String[] parts = ngay.split("/");
+                cal.set(Integer.parseInt(parts[2].trim()),
+                        Integer.parseInt(parts[1].trim()) - 1,
+                        Integer.parseInt(parts[0].trim()));
+            } else if (ngay.contains("tháng") && ngay.contains("năm 20")) {
+                // Format "Vào Thứ X, ngày D tháng M năm Y"
+                // Dùng regex lấy 3 số cuối: ngày, tháng, năm
+                java.util.regex.Matcher m = java.util.regex.Pattern
+                        .compile("ngày\\s+(\\d+)\\s+tháng\\s+(\\d+)\\s+năm\\s+(\\d+)")
+                        .matcher(ngay);
+                if (!m.find()) return -1;
+                int day   = Integer.parseInt(m.group(1));
+                int month = Integer.parseInt(m.group(2)) - 1;
+                int year  = Integer.parseInt(m.group(3));
+                cal.set(year, month, day);
+            } else {
+                return -1;
+            }
+
+            cal.set(Calendar.HOUR_OF_DAY, 0);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+
+            long diffMs  = cal.getTimeInMillis() - monday.getTimeInMillis();
+            int diffDays = (int) (diffMs / (1000L * 60 * 60 * 24));
+            return (diffDays >= 0 && diffDays < 7) ? diffDays : -1;
+
+        } catch (Exception e) {
+            return -1;
+        }
     }
 }
