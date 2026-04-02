@@ -58,11 +58,11 @@ public class PetProfileActivity extends AppCompatActivity {
             i.putExtra("pet_id", petId);
             startActivity(i);
         });
-        binding.btnVaccine.setOnClickListener(v -> {
-            Intent i = new Intent(this, VaccineActivity.class);
-            i.putExtra("pet_id", petId);
-            startActivity(i);
-        });
+//        binding.btnVaccine.setOnClickListener(v -> {
+//            Intent i = new Intent(this, VaccineActivity.class);
+//            i.putExtra("pet_id", petId);
+//            startActivity(i);
+//        });
         binding.btnDeworming.setOnClickListener(v -> {
             Intent i = new Intent(this, DewormingActivity.class);
             i.putExtra("pet_id", petId);
@@ -78,11 +78,11 @@ public class PetProfileActivity extends AppCompatActivity {
             i.putExtra("pet_id", petId);
             startActivity(i);
         });
-        binding.btnPrescription.setOnClickListener(v -> {
-            Intent i = new Intent(this, PrescriptionActivity.class);
-            i.putExtra("pet_id", petId);
-            startActivity(i);
-        });
+//        binding.btnPrescription.setOnClickListener(v -> {
+//            Intent i = new Intent(this, PrescriptionActivity.class);
+//            i.putExtra("pet_id", petId);
+//            startActivity(i);
+//        });
     }
 
     @Override
@@ -190,11 +190,11 @@ public class PetProfileActivity extends AppCompatActivity {
             final String fPrescription = prescriptionText;
 
             runOnUiThread(() -> {
-                setSummary(binding.tvVaccineSummary,      fVaccine,      false);
+//                setSummary(binding.tvVaccineSummary,      fVaccine,      false);
                 setSummary(binding.tvDewormingSummary,    fDeworming,    false);
                 setSummary(binding.tvAllergySummary,      fAllergy,      false);
                 setSummary(binding.tvDiseaseSummary,      fDisease,      true);
-                setSummary(binding.tvPrescriptionSummary, fPrescription, true);
+//                setSummary(binding.tvPrescriptionSummary, fPrescription, true);
             });
         }).start();
     }

@@ -75,13 +75,26 @@ public class MedicalRecordActivity extends AppCompatActivity {
                     ? "Ngày sinh: " + pet.ngaySinh : "Ngày sinh: Chưa có");
             binding.tvPetWeight.setText(pet.canNang > 0
                     ? "Cân nặng: " + pet.canNang + " kg" : "Cân nặng: Chưa có");
+
+            // --- ĐOẠN SỬA ---
             if (pet.anhUrl != null && !pet.anhUrl.isEmpty()) {
-                Glide.with(this).load(new java.io.File(pet.anhUrl))
-                        .placeholder(R.drawable.pet_welcome).circleCrop()
-                        .into(binding.imgPet);
+                if (pet.anhUrl.startsWith("http")) {
+                    Glide.with(this)
+                            .load(pet.anhUrl)
+                            .placeholder(R.drawable.pet_welcome)
+                            .circleCrop()
+                            .into(binding.imgPet);
+                } else {
+                    Glide.with(this)
+                            .load(new java.io.File(pet.anhUrl))
+                            .placeholder(R.drawable.pet_welcome)
+                            .circleCrop()
+                            .into(binding.imgPet);
+                }
             } else {
                 binding.imgPet.setImageResource(R.drawable.pet_welcome);
             }
+            // ----------------
         }));
     }
 

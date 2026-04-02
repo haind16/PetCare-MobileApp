@@ -24,10 +24,10 @@ public class LanguageActivity extends AppCompatActivity {
             Toast.makeText(this, "Đã chuyển sang Tiếng Việt", Toast.LENGTH_SHORT).show();
         });
 
-        binding.btnEnglish.setOnClickListener(v -> {
-            setLocale("en");
-            Toast.makeText(this, "Switched to English", Toast.LENGTH_SHORT).show();
-        });
+//        binding.btnEnglish.setOnClickListener(v -> {
+//            setLocale("en");
+//            Toast.makeText(this, "Switched to English", Toast.LENGTH_SHORT).show();
+//        });
     }
 
     private void setLocale(String lang) {

@@ -97,16 +97,25 @@ public class MedicalRecordDetailActivity extends AppCompatActivity {
                             ? "Cân nặng: " + pet.canNang + " kg"
                             : "Cân nặng: Chưa có");
 
-            // Load ảnh thú cưng
+            // --- ĐOẠN SỬA ---
             if (pet.anhUrl != null && !pet.anhUrl.isEmpty()) {
-                Glide.with(this)
-                        .load(new File(pet.anhUrl))
-                        .placeholder(R.drawable.pet_welcome)
-                        .circleCrop()
-                        .into(binding.imgPet);
+                if (pet.anhUrl.startsWith("http")) {
+                    Glide.with(this)
+                            .load(pet.anhUrl)
+                            .placeholder(R.drawable.pet_welcome)
+                            .circleCrop()
+                            .into(binding.imgPet);
+                } else {
+                    Glide.with(this)
+                            .load(new File(pet.anhUrl))
+                            .placeholder(R.drawable.pet_welcome)
+                            .circleCrop()
+                            .into(binding.imgPet);
+                }
             } else {
                 binding.imgPet.setImageResource(R.drawable.pet_welcome);
             }
+            // ----------------
         }));
     }
 

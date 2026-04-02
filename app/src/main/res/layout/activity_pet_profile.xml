@@ -130,20 +130,20 @@
             </androidx.cardview.widget.CardView>
 
             <!-- Lịch tiêm phòng -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/btnVaccine"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                app:cardCornerRadius="10dp"
-                app:cardElevation="1dp"
-                android:layout_marginBottom="8dp">
-                <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="horizontal" android:gravity="center_vertical" android:paddingStart="16dp" android:paddingEnd="16dp">
-                    <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_syringe"/>
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="12dp" android:text="Lịch tiêm phòng" android:textSize="15sp"/>
-                    <TextView android:id="@+id/tvVaccineSummary" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="13sp" android:textColor="#888888"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=" ›" android:textSize="18sp" android:textColor="#888888"/>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
+<!--            <androidx.cardview.widget.CardView-->
+<!--                android:id="@+id/btnVaccine"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="52dp"-->
+<!--                app:cardCornerRadius="10dp"-->
+<!--                app:cardElevation="1dp"-->
+<!--                android:layout_marginBottom="8dp">-->
+<!--                <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="horizontal" android:gravity="center_vertical" android:paddingStart="16dp" android:paddingEnd="16dp">-->
+<!--                    <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_syringe"/>-->
+<!--                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="12dp" android:text="Lịch tiêm phòng" android:textSize="15sp"/>-->
+<!--                    <TextView android:id="@+id/tvVaccineSummary" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="13sp" android:textColor="#888888"/>-->
+<!--                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=" ›" android:textSize="18sp" android:textColor="#888888"/>-->
+<!--                </LinearLayout>-->
+<!--            </androidx.cardview.widget.CardView>-->
 
             <!-- Tẩy giun -->
             <androidx.cardview.widget.CardView
@@ -194,20 +194,20 @@
             </androidx.cardview.widget.CardView>
 
             <!-- Đơn thuốc -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/btnPrescription"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                app:cardCornerRadius="10dp"
-                app:cardElevation="1dp"
-                android:layout_marginBottom="8dp">
-                <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="horizontal" android:gravity="center_vertical" android:paddingStart="16dp" android:paddingEnd="16dp">
-                    <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_pill"/>
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="12dp" android:text="Đơn thuốc" android:textSize="15sp"/>
-                    <TextView android:id="@+id/tvPrescriptionSummary" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="13sp" android:textColor="#888888"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=" ›" android:textSize="18sp" android:textColor="#888888"/>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
+<!--            <androidx.cardview.widget.CardView-->
+<!--                android:id="@+id/btnPrescription"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="52dp"-->
+<!--                app:cardCornerRadius="10dp"-->
+<!--                app:cardElevation="1dp"-->
+<!--                android:layout_marginBottom="8dp">-->
+<!--                <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="horizontal" android:gravity="center_vertical" android:paddingStart="16dp" android:paddingEnd="16dp">-->
+<!--                    <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_pill"/>-->
+<!--                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="12dp" android:text="Đơn thuốc" android:textSize="15sp"/>-->
+<!--                    <TextView android:id="@+id/tvPrescriptionSummary" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="13sp" android:textColor="#888888"/>-->
+<!--                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=" ›" android:textSize="18sp" android:textColor="#888888"/>-->
+<!--                </LinearLayout>-->
+<!--            </androidx.cardview.widget.CardView>-->
 
         </LinearLayout>
     </ScrollView>

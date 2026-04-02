@@ -37,36 +37,32 @@ public class CartActivity extends AppCompatActivity {
 
         binding.btnBack.setOnClickListener(v -> finish());
 
+        // Nút lịch sử đơn hàng
+        binding.btnOrderHistory.setOnClickListener(v ->
+                startActivity(new Intent(this, OrderHistoryActivity.class)));
+
         setupRecyclerView();
         setupCartRef();
         loadCartFromFirebase();
 
         binding.btnCheckout.setOnClickListener(v -> {
-            // Kiểm tra nếu giỏ hàng trống
             if (cartItems.isEmpty()) {
                 Toast.makeText(this, "Giỏ hàng của bạn đang trống!", Toast.LENGTH_SHORT).show();
             } else {
-                // Có sản phẩm mới cho phép chuyển sang màn Checkout
                 startActivity(new Intent(this, CheckoutActivity.class));
             }
         });
     }
 
-    // ----------------------------------------------------------------
-    // Setup RecyclerView
-    // ----------------------------------------------------------------
     private void setupRecyclerView() {
         adapter = new CartAdapter(cartItems, new CartAdapter.OnCartChangeListener() {
             @Override
             public void onQuantityChanged(CartAdapter.CartItem item) {
-                // Cập nhật số lượng lên Firebase
                 updateQtyOnFirebase(item);
                 updateTotal();
             }
-
             @Override
             public void onItemDeleted(CartAdapter.CartItem item) {
-                // Xoá item khỏi Firebase
                 deleteItemOnFirebase(item);
                 updateTotal();
             }
@@ -75,32 +71,20 @@ public class CartActivity extends AppCompatActivity {
         binding.rvCart.setAdapter(adapter);
     }
 
-    // ----------------------------------------------------------------
-    // Khởi tạo DatabaseReference đến carts/{userId}
-    // ----------------------------------------------------------------
     private void setupCartRef() {
         String userId = FirebaseAuth.getInstance().getCurrentUser() != null
-                ? FirebaseAuth.getInstance().getCurrentUser().getUid()
-                : null;
-
+                ? FirebaseAuth.getInstance().getCurrentUser().getUid() : null;
         if (userId == null) {
             Toast.makeText(this, "Vui lòng đăng nhập!", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
-
-        cartRef = FirebaseDatabase
-                .getInstance(DB_URL)
-                .getReference("carts")
-                .child(userId);
+        cartRef = FirebaseDatabase.getInstance(DB_URL)
+                .getReference("carts").child(userId);
     }
 
-    // ----------------------------------------------------------------
-    // Load giỏ hàng từ Firebase
-    // ----------------------------------------------------------------
     private void loadCartFromFirebase() {
         if (cartRef == null) return;
-
         cartRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -110,26 +94,17 @@ public class CartActivity extends AppCompatActivity {
                     String ten       = child.child("ten").getValue(String.class);
                     Long   giaLong   = child.child("gia").getValue(Long.class);
                     Long   soLuongL  = child.child("soLuong").getValue(Long.class);
-
-                    // Lấy link ảnh từ dữ liệu giỏ hàng trên Firebase
                     String anhUrl    = child.child("anhUrl").getValue(String.class);
-
                     if (ten == null) continue;
-
-                    long gia      = giaLong   != null ? giaLong   : 0;
-                    int  soLuong  = soLuongL  != null ? soLuongL.intValue() : 1;
-
-                    // Gán giá trị mặc định là chuỗi rỗng nếu không có ảnh
-                    String safeAnhUrl = anhUrl != null ? anhUrl : "";
-
-                    // Cập nhật constructor để truyền thêm safeAnhUrl
+                    long gia     = giaLong  != null ? giaLong  : 0;
+                    int  soLuong = soLuongL != null ? soLuongL.intValue() : 1;
                     cartItems.add(new CartAdapter.CartItem(
-                            productId, ten, gia, soLuong, safeAnhUrl));
+                            productId, ten, gia, soLuong,
+                            anhUrl != null ? anhUrl : ""));
                 }
                 adapter.notifyDataSetChanged();
                 updateTotal();
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Toast.makeText(CartActivity.this,
@@ -138,30 +113,18 @@ public class CartActivity extends AppCompatActivity {
         });
     }
 
-    // ----------------------------------------------------------------
-    // Tính & hiển thị tổng tiền
-    // ----------------------------------------------------------------
     private void updateTotal() {
         long total = 0;
-        for (CartAdapter.CartItem item : cartItems) {
-            total += item.gia * item.quantity;
-        }
-        String formatted = NumberFormat.getNumberInstance(Locale.US)
-                .format(total).replace(",", ".") + "đ";
-        binding.tvTotal.setText(formatted);
+        for (CartAdapter.CartItem item : cartItems) total += item.gia * item.quantity;
+        binding.tvTotal.setText(NumberFormat.getNumberInstance(Locale.US)
+                .format(total).replace(",", ".") + "đ");
     }
 
-    // ----------------------------------------------------------------
-    // Cập nhật số lượng 1 item trên Firebase
-    // ----------------------------------------------------------------
     private void updateQtyOnFirebase(CartAdapter.CartItem item) {
         if (cartRef == null || item.productId == null) return;
         cartRef.child(item.productId).child("soLuong").setValue(item.quantity);
     }
 
-    // ----------------------------------------------------------------
-    // Xoá 1 item khỏi Firebase
-    // ----------------------------------------------------------------
     private void deleteItemOnFirebase(CartAdapter.CartItem item) {
         if (cartRef == null || item.productId == null) return;
         cartRef.child(item.productId).removeValue();
