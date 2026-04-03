@@ -12,10 +12,14 @@ import com.nhom08.petcare.data.repository.PetRepository;
 import com.nhom08.petcare.databinding.ActivityPetProfileBinding;
 import com.nhom08.petcare.ui.pet.health.*;
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class PetProfileActivity extends AppCompatActivity {
 
@@ -98,7 +102,63 @@ public class PetProfileActivity extends AppCompatActivity {
         if (petId == null) return;
         repository.getPetById(petId, pet -> runOnUiThread(() -> {
             if (pet == null) { finish(); return; }
-            bindPetData(pet);
+
+            // Lấy thông tin cơ bản
+            binding.tvPetName.setText(pet.tenThuCung);
+            String loaiGiong = (pet.loai != null ? pet.loai : "")
+                    + (pet.giong != null && !pet.giong.isEmpty() ? " • " + pet.giong : "");
+            binding.tvPetBreed.setText(loaiGiong.isEmpty() ? "Chưa rõ" : loaiGiong);
+            binding.tvPetGender.setText(pet.gioiTinh != null ? pet.gioiTinh : "Chưa rõ");
+            binding.tvPetAge.setText(tinhTuoi(pet.ngaySinh));
+
+            // Hiển thị ảnh
+            if (pet.anhUrl != null && !pet.anhUrl.isEmpty()) {
+                if (pet.anhUrl.startsWith("http")) {
+                    Glide.with(this).load(pet.anhUrl)
+                            .centerCrop().placeholder(R.drawable.pet_welcome)
+                            .into(binding.imgPet);
+                } else {
+                    Glide.with(this).load(new File(pet.anhUrl))
+                            .centerCrop().placeholder(R.drawable.pet_welcome)
+                            .into(binding.imgPet);
+                }
+            } else {
+                binding.imgPet.setImageResource(R.drawable.pet_welcome);
+            }
+
+            // 🌟 CHẠY LUỒNG PHỤ ĐỂ LẤY CÂN NẶNG MỚI NHẤT
+            new Thread(() -> {
+                CanNangDao canNangDao = AppDatabase.getInstance(getApplicationContext()).canNangDao();
+                List<CanNang> weightRecords = canNangDao.getAllByPet(petId);
+
+                float latestWeight = pet.canNang; // Fallback lấy cân nặng gốc
+
+                if (weightRecords != null && !weightRecords.isEmpty()) {
+                    // Sắp xếp danh sách giảm dần (Ngày mới nhất lên đầu)
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                    Collections.sort(weightRecords, (c1, c2) -> {
+                        try {
+                            Date date1 = sdf.parse(c1.ngay);
+                            Date date2 = sdf.parse(c2.ngay);
+                            if (date1 != null && date2 != null) {
+                                return date2.compareTo(date1);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        return 0;
+                    });
+
+                    latestWeight = weightRecords.get(0).canNang;
+                }
+
+                // Cập nhật UI trên Main Thread
+                final float finalWeight = latestWeight;
+                runOnUiThread(() -> {
+                    binding.tvPetWeight.setText(finalWeight > 0 ? finalWeight + " kg" : "Chưa có");
+                });
+            }).start();
+            // 🌟 KẾT THÚC XỬ LÝ CÂN NẶNG
         }));
     }
 

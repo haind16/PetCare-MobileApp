@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.bumptech.glide.Glide;
 import com.nhom08.petcare.R;
 import com.nhom08.petcare.data.local.AppDatabase;
+import com.nhom08.petcare.data.local.dao.CanNangDao;
 import com.nhom08.petcare.data.model.CanNang;
 import com.nhom08.petcare.data.model.ThuCung;
 import com.nhom08.petcare.data.repository.PetRepository;
@@ -18,6 +19,11 @@ import com.nhom08.petcare.databinding.ActivityEditPetBinding;
 import com.nhom08.petcare.utils.CloudinaryUploader;
 import com.nhom08.petcare.utils.PetManager;
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 public class EditPetActivity extends AppCompatActivity {
@@ -26,6 +32,7 @@ public class EditPetActivity extends AppCompatActivity {
     private PetRepository repository;
     private ThuCung currentPet;
     private Uri selectedImageUri = null;   // Uri ảnh mới user chọn (null = chưa đổi)
+    private float oldWeight = 0f;
 
     private final ActivityResultLauncher<String> pickImage =
             registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
@@ -74,7 +81,6 @@ public class EditPetActivity extends AppCompatActivity {
     private void bindPetToForm(ThuCung pet) {
         binding.etName.setText(pet.tenThuCung);
         binding.etBirthDate.setText(pet.ngaySinh);
-        binding.etWeight.setText(pet.canNang > 0 ? String.valueOf(pet.canNang) : "");
         binding.etBreed.setText(pet.giong != null ? pet.giong : "");
         if ("Cái".equals(pet.gioiTinh)) binding.spGender.setSelection(1);
         else binding.spGender.setSelection(0);
@@ -93,6 +99,43 @@ public class EditPetActivity extends AppCompatActivity {
                         .into(binding.imgPet);
             }
         }
+
+        // 🌟 CHẠY LUỒNG PHỤ ĐỂ LẤY CÂN NẶNG MỚI NHẤT TỪ LỊCH SỬ
+        new Thread(() -> {
+            CanNangDao canNangDao = AppDatabase.getInstance(getApplicationContext()).canNangDao();
+            List<CanNang> weightRecords = canNangDao.getAllByPet(pet.id);
+
+            float latestWeight = pet.canNang; // Fallback lấy cân nặng gốc nếu chưa có lịch sử
+
+            if (weightRecords != null && !weightRecords.isEmpty()) {
+                // Sắp xếp giảm dần để lấy ngày mới nhất
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                Collections.sort(weightRecords, (c1, c2) -> {
+                    try {
+                        Date date1 = sdf.parse(c1.ngay);
+                        Date date2 = sdf.parse(c2.ngay);
+                        if (date1 != null && date2 != null) {
+                            return date2.compareTo(date1);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return 0;
+                });
+                // Lấy cân nặng ở vị trí đầu tiên (mới nhất)
+                latestWeight = weightRecords.get(0).canNang;
+            }
+
+            // Gán dữ liệu lên giao diện (Main Thread)
+            final float finalWeight = latestWeight;
+            runOnUiThread(() -> {
+                // Cập nhật biến oldWeight để dùng cho lúc Save
+                oldWeight = finalWeight;
+
+                // Hiển thị lên EditText
+                binding.etWeight.setText(finalWeight > 0 ? String.valueOf(finalWeight) : "");
+            });
+        }).start();
     }
 
     private void validateAndSave() {
@@ -148,7 +191,7 @@ public class EditPetActivity extends AppCompatActivity {
 
         repository.updatePet(currentPet, result -> runOnUiThread(() -> {
             // Tạo bản ghi can_nang nếu cân nặng thay đổi
-            if (currentPet.canNang > 0) {
+            if (currentPet.canNang > 0 && currentPet.canNang != oldWeight) {
                 new Thread(() -> {
                     CanNang cn  = new CanNang();
                     cn.id       = UUID.randomUUID().toString();
@@ -157,7 +200,9 @@ public class EditPetActivity extends AppCompatActivity {
                     cn.ngay     = new java.text.SimpleDateFormat(
                             "dd/MM/yyyy", java.util.Locale.getDefault()
                     ).format(new java.util.Date());
-                    AppDatabase.getInstance(this).canNangDao().insert(cn);
+
+                    // Nhớ dùng getApplicationContext() cho an toàn khi lưu DB trong Thread nhé
+                    AppDatabase.getInstance(getApplicationContext()).canNangDao().insert(cn);
                 }).start();
             }
 

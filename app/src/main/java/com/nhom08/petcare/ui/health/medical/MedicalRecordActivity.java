@@ -8,13 +8,21 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import com.bumptech.glide.Glide;
 import com.nhom08.petcare.R;
+import com.nhom08.petcare.data.local.AppDatabase;
+import com.nhom08.petcare.data.local.dao.CanNangDao;
+import com.nhom08.petcare.data.model.CanNang;
 import com.nhom08.petcare.data.model.HoSoYTe;
 import com.nhom08.petcare.data.repository.HoSoYTeRepository;
 import com.nhom08.petcare.data.repository.PetRepository;
 import com.nhom08.petcare.databinding.ActivityMedicalRecordBinding;
 import com.nhom08.petcare.utils.PetManager;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class MedicalRecordActivity extends AppCompatActivity {
 
@@ -73,8 +81,35 @@ public class MedicalRecordActivity extends AppCompatActivity {
             binding.tvPetName.setText(pet.tenThuCung != null ? pet.tenThuCung : "");
             binding.tvPetAge.setText(pet.ngaySinh != null && !pet.ngaySinh.isEmpty()
                     ? "Ngày sinh: " + pet.ngaySinh : "Ngày sinh: Chưa có");
-            binding.tvPetWeight.setText(pet.canNang > 0
-                    ? "Cân nặng: " + pet.canNang + " kg" : "Cân nặng: Chưa có");
+            new Thread(() -> {
+                CanNangDao canNangDao = AppDatabase.getInstance(getApplicationContext()).canNangDao();
+                List<CanNang> weightRecords = canNangDao.getAllByPet(petId);
+
+                if (weightRecords != null && !weightRecords.isEmpty()) {
+                    // Sắp xếp danh sách giảm dần (Ngày mới nhất lên đầu)
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                    Collections.sort(weightRecords, (c1, c2) -> {
+                        try {
+                            Date date1 = sdf.parse(c1.ngay);
+                            Date date2 = sdf.parse(c2.ngay);
+                            if (date1 != null && date2 != null) {
+                                return date2.compareTo(date1);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        return 0;
+                    });
+
+                    // Lấy cân nặng của bản ghi đầu tiên (mới nhất)
+                    float latestWeight = weightRecords.get(0).canNang;
+                    runOnUiThread(() -> binding.tvPetWeight.setText("Cân nặng: " + latestWeight + " kg"));
+                } else {
+                    // Nếu chưa từng nhập lịch sử cân nặng nào, lấy tạm cân nặng gốc trong bảng ThuCung
+                    runOnUiThread(() -> binding.tvPetWeight.setText(pet.canNang > 0
+                            ? "Cân nặng: " + pet.canNang + " kg" : "Cân nặng: Chưa có"));
+                }
+            }).start();
 
             // --- ĐOẠN SỬA ---
             if (pet.anhUrl != null && !pet.anhUrl.isEmpty()) {

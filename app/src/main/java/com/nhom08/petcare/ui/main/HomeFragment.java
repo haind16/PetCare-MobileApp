@@ -19,6 +19,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.nhom08.petcare.R;
+import com.nhom08.petcare.data.local.AppDatabase;
+import com.nhom08.petcare.data.local.dao.CanNangDao;
+import com.nhom08.petcare.data.model.CanNang;
 import com.nhom08.petcare.data.model.NhacNho;
 import com.nhom08.petcare.data.repository.NhacNhoRepository;
 import com.nhom08.petcare.data.repository.PetRepository;
@@ -29,11 +32,15 @@ import com.nhom08.petcare.ui.pet.list.PetSelectorActivity;
 import com.nhom08.petcare.utils.PetManager;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class HomeFragment extends Fragment {
 
@@ -90,33 +97,66 @@ public class HomeFragment extends Fragment {
 
         petRepository.getPetById(pm.getCurrentPetId(), pet -> {
             if (getActivity() == null || binding == null) return;
-            getActivity().runOnUiThread(() -> {
-                if (pet == null) { pm.clearCurrentPet(); showEmptyState(); return; }
+            new Thread(() -> {
+                CanNangDao canNangDao = AppDatabase.getInstance(requireContext()).canNangDao();
+                List<CanNang> weightRecords = canNangDao.getAllByPet(pm.getCurrentPetId());
 
-                binding.tvPetName.setText(pet.tenThuCung);
-                binding.tvPetAge.setText(tinhTuoi(pet.ngaySinh));
-                binding.tvPetWeight.setText(pet.canNang > 0
-                        ? "Cân nặng: " + pet.canNang + " kg"
-                        : "Cân nặng: Chưa có");
+                float latestWeight = pet.canNang; // Mặc định lấy cân nặng lúc tạo hồ sơ
 
-                if (pet.anhUrl != null && !pet.anhUrl.isEmpty()) {
-                    if (pet.anhUrl.startsWith("http")) {
-                        Glide.with(requireContext())
-                                .load(pet.anhUrl)
-                                .circleCrop()
-                                .placeholder(R.drawable.pet_welcome)
-                                .into(binding.imgPet);
-                    } else {
-                        Glide.with(requireContext())
-                                .load(new File(pet.anhUrl))
-                                .circleCrop()
-                                .placeholder(R.drawable.pet_welcome)
-                                .into(binding.imgPet);
-                    }
-                } else {
-                    binding.imgPet.setImageResource(R.drawable.pet_welcome);
+                if (weightRecords != null && !weightRecords.isEmpty()) {
+                    // Sắp xếp danh sách giảm dần (Ngày mới nhất lên đầu)
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                    Collections.sort(weightRecords, (c1, c2) -> {
+                        try {
+                            Date date1 = sdf.parse(c1.ngay);
+                            Date date2 = sdf.parse(c2.ngay);
+                            if (date1 != null && date2 != null) {
+                                return date2.compareTo(date1);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        return 0;
+                    });
+
+                    // Lấy cân nặng mới nhất
+                    latestWeight = weightRecords.get(0).canNang;
                 }
-            });
+
+                // Cập nhật giao diện trên luồng chính
+                final float finalWeight = latestWeight;
+                getActivity().runOnUiThread(() -> {
+                    if (binding == null) return;
+                    if (pet == null) { pm.clearCurrentPet(); showEmptyState(); return; }
+
+                    binding.tvPetName.setText(pet.tenThuCung);
+                    binding.tvPetAge.setText(tinhTuoi(pet.ngaySinh));
+
+                    // Hiển thị cân nặng mới nhất
+                    binding.tvPetWeight.setText(finalWeight > 0
+                            ? "Cân nặng: " + finalWeight + " kg"
+                            : "Cân nặng: Chưa có");
+
+                    // Xử lý hiển thị ảnh
+                    if (pet.anhUrl != null && !pet.anhUrl.isEmpty()) {
+                        if (pet.anhUrl.startsWith("http")) {
+                            Glide.with(requireContext())
+                                    .load(pet.anhUrl)
+                                    .circleCrop()
+                                    .placeholder(R.drawable.pet_welcome)
+                                    .into(binding.imgPet);
+                        } else {
+                            Glide.with(requireContext())
+                                    .load(new File(pet.anhUrl))
+                                    .circleCrop()
+                                    .placeholder(R.drawable.pet_welcome)
+                                    .into(binding.imgPet);
+                        }
+                    } else {
+                        binding.imgPet.setImageResource(R.drawable.pet_welcome);
+                    }
+                });
+            }).start();
         });
     }
 
