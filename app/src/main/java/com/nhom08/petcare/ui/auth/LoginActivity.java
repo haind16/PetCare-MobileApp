@@ -10,6 +10,10 @@ import com.google.firebase.auth.FirebaseUser;
 import com.nhom08.petcare.databinding.ActivityLoginBinding;
 import com.nhom08.petcare.ui.main.MainActivity;
 
+/**
+ * Activity xử lý đăng nhập người dùng.
+ * Kết nối Firebase Authentication để xác thực tài khoản qua Email và Password.
+ */
 public class LoginActivity extends AppCompatActivity {
 
     private ActivityLoginBinding binding;
@@ -21,22 +25,33 @@ public class LoginActivity extends AppCompatActivity {
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        // Khởi tạo Firebase Auth
         auth = FirebaseAuth.getInstance();
 
+        // Sự kiện nút quay lại
         binding.btnBack.setOnClickListener(v -> finish());
+        
+        // Sự kiện nút đăng nhập
         binding.btnSubmit.setOnClickListener(v -> login());
 
+        // Chuyển sang màn hình quên mật khẩu
         binding.tvForgotPassword.setOnClickListener(v ->
                 startActivity(new Intent(this, ForgotPasswordActivity.class)));
 
+        // Chuyển sang màn hình đăng ký
         binding.tvRegister.setOnClickListener(v ->
                 startActivity(new Intent(this, RegisterActivity.class)));
     }
 
+    /**
+     * Thực hiện logic đăng nhập.
+     * Kiểm tra tính hợp lệ của dữ liệu đầu vào và gọi Firebase Auth.
+     */
     private void login() {
         String email    = binding.etUsername.getText().toString().trim();
         String password = binding.etPassword.getText().toString().trim();
 
+        // Kiểm tra dữ liệu trống
         if (email.isEmpty()) {
             binding.etUsername.setError("Vui lòng nhập email");
             return;
@@ -53,6 +68,7 @@ public class LoginActivity extends AppCompatActivity {
         binding.progressBar.setVisibility(View.VISIBLE);
         binding.btnSubmit.setEnabled(false);
 
+        // Gọi Firebase API để đăng nhập
         auth.signInWithEmailAndPassword(email, password)
                 .addOnSuccessListener(result -> {
                     binding.progressBar.setVisibility(View.GONE);
@@ -60,7 +76,7 @@ public class LoginActivity extends AppCompatActivity {
                     FirebaseUser user = result.getUser();
 
                     // Kiểm tra email đã xác nhận chưa
-                    if (!user.isEmailVerified()) {
+                    if (user != null && !user.isEmailVerified()) {
                         // Chưa xác nhận → đăng xuất, hiện thông báo
                         FirebaseAuth.getInstance().signOut();
                         binding.btnSubmit.setEnabled(true);
@@ -97,9 +113,11 @@ public class LoginActivity extends AppCompatActivity {
                 });
     }
 
-    // ----------------------------------------------------------------
-    // Dialog gửi lại email xác nhận
-    // ----------------------------------------------------------------
+    /**
+     * Hiển thị Dialog cho phép người dùng gửi lại email xác nhận tài khoản.
+     * @param email Email của người dùng
+     * @param password Mật khẩu của người dùng
+     */
     private void showResendVerificationDialog(String email, String password) {
         new androidx.appcompat.app.AlertDialog.Builder(this)
                 .setTitle("Email chưa xác nhận")
@@ -108,19 +126,21 @@ public class LoginActivity extends AppCompatActivity {
                     // Đăng nhập lại tạm để gửi mail
                     auth.signInWithEmailAndPassword(email, password)
                             .addOnSuccessListener(result -> {
-                                result.getUser().sendEmailVerification()
-                                        .addOnSuccessListener(v -> {
-                                            FirebaseAuth.getInstance().signOut();
-                                            Toast.makeText(this,
-                                                    "Đã gửi lại email xác nhận!",
-                                                    Toast.LENGTH_SHORT).show();
-                                        })
-                                        .addOnFailureListener(e -> {
-                                            FirebaseAuth.getInstance().signOut();
-                                            Toast.makeText(this,
-                                                    "Không gửi được email: " + e.getMessage(),
-                                                    Toast.LENGTH_SHORT).show();
-                                        });
+                                if (result.getUser() != null) {
+                                    result.getUser().sendEmailVerification()
+                                            .addOnSuccessListener(v -> {
+                                                FirebaseAuth.getInstance().signOut();
+                                                Toast.makeText(this,
+                                                        "Đã gửi lại email xác nhận!",
+                                                        Toast.LENGTH_SHORT).show();
+                                            })
+                                            .addOnFailureListener(e -> {
+                                                FirebaseAuth.getInstance().signOut();
+                                                Toast.makeText(this,
+                                                        "Không gửi được email: " + e.getMessage(),
+                                                        Toast.LENGTH_SHORT).show();
+                                            });
+                                }
                             });
                 })
                 .setNegativeButton("Để sau", null)

@@ -16,11 +16,15 @@ import com.nhom08.petcare.utils.PetManager;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Activity hiển thị danh sách nhật ký hoạt động của thú cưng.
+ * Người dùng có thể xem lại lịch sử các hoạt động, thêm nhật ký mới hoặc xóa nhật ký cũ.
+ */
 public class DiaryActivity extends AppCompatActivity {
 
     private ActivityDiaryBinding binding;
     private final List<HistoryAdapter.HistoryItem> list = new ArrayList<>();
-    private final List<NhatKy> rawList = new ArrayList<>(); // giữ data gốc để lấy id khi xóa
+    private final List<NhatKy> rawList = new ArrayList<>(); // Giữ dữ liệu gốc từ database để xử lý ID
     private HistoryAdapter adapter;
     private NhatKyRepository repo;
     private String petId;
@@ -35,11 +39,14 @@ public class DiaryActivity extends AppCompatActivity {
         petId = PetManager.getInstance(this).getCurrentPetId();
 
         binding.btnBack.setOnClickListener(v -> finish());
+        
+        // Chuyển sang màn hình thêm nhật ký mới
         binding.btnAddActivity.setOnClickListener(v ->
                 startActivity(new Intent(this, AddDiaryActivity.class)));
 
+        // Khởi tạo adapter với listener cho sự kiện click xem chi tiết và xóa
         adapter = new HistoryAdapter(list,
-                // Click xem chi tiết
+                // Xử lý khi người dùng nhấn vào một item nhật ký
                 (position, item) -> {
                     NhatKy nk = rawList.get(position);
                     Intent intent = new Intent(this, DiaryDetailActivity.class);
@@ -49,7 +56,7 @@ public class DiaryActivity extends AppCompatActivity {
                     intent.putExtra("note", nk.ghiChu);
                     startActivity(intent);
                 },
-                // Xóa
+                // Xử lý khi người dùng nhấn nút xóa nhật ký
                 position -> {
                     NhatKy nk = rawList.get(position);
                     repo.delete(nk.id, r -> runOnUiThread(() -> {
@@ -67,9 +74,13 @@ public class DiaryActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        // Tải lại dữ liệu khi quay lại màn hình
         loadData();
     }
 
+    /**
+     * Tải danh sách nhật ký từ Repository và chuyển đổi sang dạng hiển thị.
+     */
     private void loadData() {
         if (petId == null || petId.isEmpty()) return;
 
@@ -78,6 +89,7 @@ public class DiaryActivity extends AppCompatActivity {
             list.clear();
             for (NhatKy nk : records) {
                 rawList.add(nk);
+                // HistoryItem là model chung dùng cho nhiều màn hình hiển thị lịch sử
                 list.add(new HistoryAdapter.HistoryItem(
                         nk.loaiHoatDong,
                         nk.ngay

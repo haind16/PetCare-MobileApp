@@ -9,6 +9,10 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * Repository quản lý Hồ sơ y tế của thú cưng.
+ * Lưu trữ các thông tin như đơn thuốc, phiếu khám, kết quả xét nghiệm dưới dạng hồ sơ điện tử trong Room Database.
+ */
 public class HoSoYTeRepository {
 
     private HoSoYTeDao dao;
@@ -22,14 +26,23 @@ public class HoSoYTeRepository {
         void onResult(T result);
     }
 
+    /**
+     * Lấy toàn bộ hồ sơ y tế của một thú cưng.
+     */
     public void getAll(String petId, Callback<List<HoSoYTe>> cb) {
         executor.execute(() -> cb.onResult(dao.getAllByPet(petId)));
     }
 
+    /**
+     * Lấy chi tiết một hồ sơ y tế theo ID.
+     */
     public void getById(String id, Callback<HoSoYTe> cb) {
         executor.execute(() -> cb.onResult(dao.getById(id)));
     }
 
+    /**
+     * Thêm mới hồ sơ y tế.
+     */
     public void add(HoSoYTe item, Callback<Void> cb) {
         executor.execute(() -> {
             if (item.id == null || item.id.isEmpty())
@@ -39,6 +52,9 @@ public class HoSoYTeRepository {
         });
     }
 
+    /**
+     * Cập nhật thông tin hồ sơ y tế.
+     */
     public void update(HoSoYTe item, Callback<Void> cb) {
         executor.execute(() -> {
             dao.update(item);
@@ -46,6 +62,9 @@ public class HoSoYTeRepository {
         });
     }
 
+    /**
+     * Xóa hồ sơ y tế.
+     */
     public void delete(String id, Callback<Void> cb) {
         executor.execute(() -> {
             dao.deleteById(id);

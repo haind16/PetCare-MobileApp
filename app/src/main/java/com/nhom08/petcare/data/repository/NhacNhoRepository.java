@@ -9,6 +9,10 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * Repository quản lý các nhắc nhở chăm sóc thú cưng.
+ * Thực hiện các thao tác CRUD (Thêm, Sửa, Xóa, Lấy danh sách) trên bảng nhac_nho trong Room Database.
+ */
 public class NhacNhoRepository {
 
     private NhacNhoDao dao;
@@ -22,16 +26,25 @@ public class NhacNhoRepository {
         void onResult(T result);
     }
 
+    /**
+     * Lấy toàn bộ danh sách nhắc nhở của một thú cưng.
+     */
     public void getAll(String petId, Callback<List<NhacNho>> cb) {
         executor.execute(() -> cb.onResult(dao.getAllByPet(petId)));
     }
 
+    /**
+     * Lấy danh sách các nhắc nhở chưa được đánh dấu là hoàn thành.
+     */
     public void getChuaHoanThanh(String petId,
                                  Callback<List<NhacNho>> cb) {
         executor.execute(() -> cb.onResult(
                 dao.getChuaHoanThanh(petId)));
     }
 
+    /**
+     * Thêm mới một nhắc nhở chăm sóc.
+     */
     public void add(NhacNho item, Callback<Void> cb) {
         executor.execute(() -> {
             if (item.id == null || item.id.isEmpty())
@@ -41,6 +54,9 @@ public class NhacNhoRepository {
         });
     }
 
+    /**
+     * Cập nhật trạng thái hoặc thông tin nhắc nhở.
+     */
     public void update(NhacNho item, Callback<Void> cb) {
         executor.execute(() -> {
             dao.update(item);
@@ -48,6 +64,9 @@ public class NhacNhoRepository {
         });
     }
 
+    /**
+     * Xóa nhắc nhở theo ID.
+     */
     public void delete(String id, Callback<Void> cb) {
         executor.execute(() -> {
             dao.deleteById(id);

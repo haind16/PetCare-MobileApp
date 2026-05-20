@@ -10,6 +10,11 @@ import com.nhom08.petcare.ui.auth.LoginActivity;
 import com.nhom08.petcare.ui.auth.RegisterActivity;
 import com.nhom08.petcare.ui.main.MainActivity;
 
+/**
+ * Activity màn hình chào mừng.
+ * Kiểm tra trạng thái đăng nhập của người dùng.
+ * Nếu đã đăng nhập thì chuyển vào trang chủ, nếu chưa thì cho phép chọn Đăng nhập/Đăng ký.
+ */
 public class WelcomeActivity extends AppCompatActivity {
 
     private ActivityWelcomeBinding binding;
@@ -20,15 +25,16 @@ public class WelcomeActivity extends AppCompatActivity {
         binding = ActivityWelcomeBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // Đã login → vào thẳng MainActivity
+        // Kiểm tra xem người dùng đã đăng nhập chưa thông qua Firebase Auth
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
+            // Nếu đã login → chuyển thẳng vào MainActivity
             startActivity(new Intent(this, MainActivity.class));
             finish();
             return;
         }
 
-        // Chưa login → hiện màn Welcome bình thường
+        // Nếu chưa login → hiển thị các nút điều hướng đến màn hình Đăng nhập và Đăng ký
         binding.btnLogin.setOnClickListener(v ->
                 startActivity(new Intent(this, LoginActivity.class)));
 

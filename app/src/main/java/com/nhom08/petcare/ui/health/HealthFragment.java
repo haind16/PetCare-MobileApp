@@ -31,6 +31,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Fragment Sức khỏe.
+ * Cung cấp cái nhìn tổng quan về sức khỏe thú cưng qua biểu đồ cân nặng gần nhất 
+ * và các phím tắt truy cập vào: Cẩm nang bệnh lý, Dinh dưỡng, Kết nối thú y, Hồ sơ y tế và Nhật ký.
+ */
 public class HealthFragment extends Fragment {
 
     private FragmentHealthBinding binding;
@@ -44,30 +49,36 @@ public class HealthFragment extends Fragment {
         binding = FragmentHealthBinding.inflate(inflater, container, false);
         canNangDao = AppDatabase.getInstance(requireContext()).canNangDao();
 
+        // Xem thống kê chi tiết
         binding.tvViewAll.setOnClickListener(v ->
                 startActivity(new Intent(getActivity(), HealthStatisticsActivity.class)));
 
+        // Truy cập cẩm nang bệnh lý
         binding.btnDiseaseLib.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), InfoListActivity.class);
             intent.putExtra("type", InfoListActivity.TYPE_DISEASE);
             startActivity(intent);
         });
 
+        // Truy cập thông tin dinh dưỡng
         binding.btnNutrition.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), InfoListActivity.class);
             intent.putExtra("type", InfoListActivity.TYPE_NUTRITION);
             startActivity(intent);
         });
 
+        // Liên hệ/Danh sách phòng khám thú y
         binding.btnVetContact.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), InfoListActivity.class);
             intent.putExtra("type", InfoListActivity.TYPE_VET);
             startActivity(intent);
         });
 
+        // Quản lý hồ sơ y tế (Đơn thuốc, phiếu khám)
         binding.btnMedicalRecord.setOnClickListener(v ->
                 startActivity(new Intent(getActivity(), MedicalRecordActivity.class)));
 
+        // Xem nhật ký hoạt động
         binding.btnDiary.setOnClickListener(v ->
                 startActivity(new Intent(getActivity(), DiaryActivity.class)));
 
@@ -77,9 +88,13 @@ public class HealthFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        // Cập nhật lại biểu đồ mỗi khi quay lại fragment
         loadChartData();
     }
 
+    /**
+     * Tải dữ liệu cân nặng từ local database để hiển thị lên biểu đồ tóm tắt.
+     */
     private void loadChartData() {
         String petId = PetManager.getInstance(requireContext()).getCurrentPetId();
         if (petId == null || petId.isEmpty()) {
@@ -90,27 +105,30 @@ public class HealthFragment extends Fragment {
         new Thread(() -> {
             List<CanNang> records = canNangDao.getAllByPet(petId);
 
+            // Sắp xếp dữ liệu theo trình tự thời gian tăng dần
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
             Collections.sort(records, (c1, c2) -> {
                 try {
                     Date date1 = sdf.parse(c1.ngay);
                     Date date2 = sdf.parse(c2.ngay);
                     if (date1 != null && date2 != null) {
-                        return date1.compareTo(date2); // Sắp xếp tăng dần (Cũ -> Mới)
+                        return date1.compareTo(date2);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
                 return 0;
             });
+            
             if (getActivity() == null || binding == null) return;
+            
             getActivity().runOnUiThread(() -> {
                 if (binding == null) return;
                 if (records.isEmpty()) {
                     setupEmptyChart();
                     return;
                 }
-                // Lấy tối đa 6 bản ghi mới nhất (getAllByPet sắp xếp ASC)
+                // Lấy 6 mốc cân nặng gần nhất để hiển thị biểu đồ tóm tắt
                 int start = Math.max(0, records.size() - 6);
                 List<CanNang> recent = records.subList(start, records.size());
 
@@ -118,16 +136,18 @@ public class HealthFragment extends Fragment {
                 List<String> labels = new ArrayList<>();
                 for (int i = 0; i < recent.size(); i++) {
                     entries.add(new Entry(i, recent.get(i).canNang));
-                    // Lấy ngày dạng dd/MM → hiển thị "dd/MM" ngắn gọn
                     String ngay = recent.get(i).ngay;
                     labels.add(ngay != null && ngay.length() >= 5
-                            ? ngay.substring(0, 5) : ngay);
+                            ? ngay.substring(0, 5) : ngay); // Rút gọn ngày để hiển thị
                 }
                 renderChart(binding.lineChart, entries, labels);
             });
         }).start();
     }
 
+    /**
+     * Cấu hình và hiển thị biểu đồ đường (LineChart).
+     */
     private void renderChart(LineChart chart, List<Entry> entries, List<String> labels) {
         LineDataSet dataSet = new LineDataSet(entries, "Cân nặng (kg)");
         dataSet.setColor(0xFF4FC3F7);

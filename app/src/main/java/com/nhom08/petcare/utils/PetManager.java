@@ -3,6 +3,10 @@ package com.nhom08.petcare.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+/**
+ * Manager xử lý lưu trữ và truy xuất thông tin thú cưng đang được chọn hiện tại.
+ * Sử dụng SharedPreferences để duy trì trạng thái thú cưng được chọn xuyên suốt ứng dụng.
+ */
 public class PetManager {
 
     private static final String PREF_NAME   = "pet_prefs";
@@ -19,6 +23,9 @@ public class PetManager {
                 .getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     }
 
+    /**
+     * Singleton Pattern để lấy instance của PetManager.
+     */
     public static PetManager getInstance(Context context) {
         if (instance == null) {
             instance = new PetManager(context);
@@ -26,6 +33,9 @@ public class PetManager {
         return instance;
     }
 
+    /**
+     * Lưu thông tin thú cưng được chọn hiện tại vào SharedPreferences.
+     */
     public void setCurrentPet(String petId, String petName, String anhUrl) {
         prefs.edit()
                 .putString(KEY_PET_ID,   petId)
@@ -50,12 +60,17 @@ public class PetManager {
         return prefs.getString(KEY_PET_ANH, "");
     }
 
-    // ✅ Fix: check cả null lẫn empty string
+    /**
+     * Kiểm tra xem người dùng đã chọn thú cưng nào để quản lý chưa.
+     */
     public boolean hasPet() {
         String id = getCurrentPetId();
         return id != null && !id.isEmpty();
     }
 
+    /**
+     * Xóa thông tin thú cưng đang chọn.
+     */
     public void clearCurrentPet() {
         prefs.edit()
                 .remove(KEY_PET_ID)
@@ -64,7 +79,9 @@ public class PetManager {
                 .apply();
     }
 
-    // Xóa toàn bộ (dùng khi logout)
+    /**
+     * Xóa toàn bộ dữ liệu trong PetManager (thường dùng khi đăng xuất).
+     */
     public void clear() {
         prefs.edit().clear().apply();
     }

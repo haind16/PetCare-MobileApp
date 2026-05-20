@@ -19,11 +19,18 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
 
+/**
+ * Adapter hiển thị danh sách thú cưng trong RecyclerView.
+ * Hỗ trợ hiển thị thông tin tóm tắt (ảnh, tên, tuổi, giống) và các thao tác Chỉnh sửa, Xóa.
+ */
 public class PetAdapter extends RecyclerView.Adapter<PetAdapter.PetViewHolder> {
 
     private List<ThuCung> petList;
     private OnDeleteListener deleteListener;
 
+    /**
+     * Interface lắng nghe sự kiện xóa thú cưng.
+     */
     public interface OnDeleteListener {
         void onDelete(ThuCung pet);
     }
@@ -51,21 +58,21 @@ public class PetAdapter extends RecyclerView.Adapter<PetAdapter.PetViewHolder> {
         holder.tvGender.setText(pet.gioiTinh);
         holder.tvBreed.setText(pet.giong);
 
-        // HIỂN THỊ TUỔI THAY VÌ HIỂN THỊ NGÀY SINH
+        // Hiển thị tuổi được tính toán từ ngày sinh
         if (pet.ngaySinh != null && !pet.ngaySinh.isEmpty()) {
             holder.tvAge.setText(tinhTuoi(pet.ngaySinh));
         } else {
             holder.tvAge.setText("Chưa rõ");
         }
 
-        // Load ảnh từ File Internal
+        // Tải ảnh thú cưng sử dụng Glide (hỗ trợ cả URL và Path nội bộ)
         if (pet.anhUrl != null && !pet.anhUrl.isEmpty()) {
             if (pet.anhUrl.startsWith("http")) {
                 Glide.with(holder.itemView.getContext())
                         .load(pet.anhUrl)
-                        .circleCrop() // hoặc centerCrop tùy ý bạn
+                        .circleCrop()
                         .placeholder(R.drawable.pet_welcome)
-                        .into(holder.imgPet); // đổi tên biến imgPet cho khớp với code của bạn
+                        .into(holder.imgPet);
             } else {
                 Glide.with(holder.itemView.getContext())
                         .load(new File(pet.anhUrl))
@@ -77,9 +84,10 @@ public class PetAdapter extends RecyclerView.Adapter<PetAdapter.PetViewHolder> {
             holder.imgPet.setImageResource(R.drawable.pet_welcome);
         }
 
+        // Sự kiện khi nhấn Chỉnh sửa/Xem hồ sơ
         holder.btnEdit.setOnClickListener(v -> {
             int pos = holder.getAdapterPosition();
-            if (pos == RecyclerView.NO_ID) return;
+            if (pos == RecyclerView.NO_POSITION) return;
             ThuCung current = petList.get(pos);
             Intent intent = new Intent(v.getContext(), PetProfileActivity.class);
             intent.putExtra("pet_id", current.id);
@@ -87,9 +95,10 @@ public class PetAdapter extends RecyclerView.Adapter<PetAdapter.PetViewHolder> {
             v.getContext().startActivity(intent);
         });
 
+        // Sự kiện khi nhấn nút Xóa
         holder.btnDelete.setOnClickListener(v -> {
             int pos = holder.getAdapterPosition();
-            if (pos == RecyclerView.NO_ID) return;
+            if (pos == RecyclerView.NO_POSITION) return;
             ThuCung current = petList.get(pos);
             if (deleteListener != null) deleteListener.onDelete(current);
         });
@@ -98,7 +107,9 @@ public class PetAdapter extends RecyclerView.Adapter<PetAdapter.PetViewHolder> {
     @Override
     public int getItemCount() { return petList.size(); }
 
-    // THÊM HÀM TÍNH TUỔI VÀO ĐÂY (Giống hệt bên PetProfileActivity)
+    /**
+     * Hàm tính tuổi dựa trên ngày sinh (dd/MM/yyyy).
+     */
     private String tinhTuoi(String ngaySinh) {
         try {
             DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");

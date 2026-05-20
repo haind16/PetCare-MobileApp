@@ -19,18 +19,23 @@ import com.nhom08.petcare.utils.CloudinaryUploader;
 import com.nhom08.petcare.utils.PetManager;
 import java.util.UUID;
 
+/**
+ * Activity hỗ trợ thêm mới hồ sơ thú cưng.
+ * Người dùng nhập thông tin: Tên, loại, giống, giới tính, cân nặng, ngày sinh và chọn ảnh.
+ * Ảnh sẽ được tải lên Cloudinary, dữ liệu lưu vào Room Database và đồng bộ lên Firebase.
+ */
 public class AddPetActivity extends AppCompatActivity {
 
     private ActivityAddPetBinding binding;
     private PetRepository repository;
-    private Uri selectedImageUri = null;   // Uri ảnh user chọn
-    private String localImagePath = null;  // Đường dẫn local (dự phòng offline)
+    private Uri selectedImageUri = null;   // Uri của ảnh người dùng đã chọn từ thư viện
 
+    // Khởi tạo trình chọn ảnh từ thư viện
     private final ActivityResultLauncher<String> pickImage =
             registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
                 if (uri != null) {
                     selectedImageUri = uri;
-                    // Preview ảnh ngay lập tức
+                    // Hiển thị ảnh xem trước dạng hình tròn
                     Glide.with(this).load(uri).circleCrop().into(binding.imgPetPreview);
                 }
             });
@@ -50,6 +55,9 @@ public class AddPetActivity extends AppCompatActivity {
         setupSpinners();
     }
 
+    /**
+     * Khởi tạo dữ liệu cho các Spinner (Loại thú cưng, Giới tính).
+     */
     private void setupSpinners() {
         ArrayAdapter<String> loaiAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item, new String[]{"Chó", "Mèo", "Khác"});
@@ -62,6 +70,9 @@ public class AddPetActivity extends AppCompatActivity {
         binding.spGender.setAdapter(genderAdapter);
     }
 
+    /**
+     * Kiểm tra tính hợp lệ của dữ liệu nhập vào trước khi lưu.
+     */
     private void validateAndSave() {
         String ten = binding.etName.getText().toString().trim();
         if (ten.isEmpty()) {
@@ -69,32 +80,35 @@ public class AddPetActivity extends AppCompatActivity {
             return;
         }
 
-        // Disable nút để tránh bấm 2 lần
         binding.btnConfirm.setEnabled(false);
         binding.progressBar.setVisibility(View.VISIBLE);
 
         if (selectedImageUri != null) {
-            // Có chọn ảnh → upload Cloudinary trước
+            // Nếu người dùng có chọn ảnh, tiến hành upload lên Cloudinary trước khi lưu hồ sơ
             CloudinaryUploader.uploadImage(this, selectedImageUri, new CloudinaryUploader.UploadCallback() {
                 @Override
                 public void onSuccess(String imageUrl) {
-                    savePet(imageUrl); // lưu với Cloudinary URL
+                    savePet(imageUrl); // Lưu hồ sơ kèm theo URL ảnh từ Cloudinary
                 }
 
                 @Override
                 public void onFailure(String error) {
-                    // Upload thất bại → lưu local path dự phòng
+                    // Nếu upload thất bại, lưu bằng đường dẫn ảnh local để đảm bảo hoạt động offline
                     Toast.makeText(AddPetActivity.this,
                             "Không upload được ảnh, lưu offline", Toast.LENGTH_SHORT).show();
                     savePet(saveImageToInternal(selectedImageUri));
                 }
             });
         } else {
-            // Không chọn ảnh → lưu luôn
+            // Trường hợp không chọn ảnh
             savePet(null);
         }
     }
 
+    /**
+     * Thực hiện lưu thông tin thú cưng vào cơ sở dữ liệu.
+     * @param imageUrl Đường dẫn ảnh (URL hoặc local path)
+     */
     private void savePet(String imageUrl) {
         String ten        = binding.etName.getText().toString().trim();
         String loai       = binding.spLoai.getSelectedItem().toString();
@@ -114,10 +128,11 @@ public class AddPetActivity extends AppCompatActivity {
         pet.gioiTinh   = gioiTinh;
         pet.canNang    = canNangStr.isEmpty() ? 0 : Float.parseFloat(canNangStr);
         pet.ngaySinh   = ngaySinh;
-        pet.anhUrl     = imageUrl; // Cloudinary URL hoặc local path hoặc null
+        pet.anhUrl     = imageUrl;
 
+        // Lưu thông qua Repository
         repository.addPet(pet, result -> runOnUiThread(() -> {
-            // Nếu có nhập cân nặng → tạo bản ghi can_nang
+            // Nếu có nhập cân nặng ban đầu, tự động tạo một bản ghi lịch sử cân nặng
             if (pet.canNang > 0) {
                 new Thread(() -> {
                     CanNang cn = new CanNang();
@@ -131,6 +146,7 @@ public class AddPetActivity extends AppCompatActivity {
                 }).start();
             }
 
+            // Thiết lập thú cưng vừa tạo làm thú cưng mặc định hiện tại
             PetManager.getInstance(this).setCurrentPet(
                     pet.id, pet.tenThuCung,
                     pet.anhUrl != null ? pet.anhUrl : "");
@@ -141,7 +157,9 @@ public class AddPetActivity extends AppCompatActivity {
         }));
     }
 
-    // Lưu ảnh local làm fallback khi không có mạng
+    /**
+     * Copy ảnh từ Uri vào bộ nhớ trong của ứng dụng để lưu trữ offline.
+     */
     private String saveImageToInternal(Uri uri) {
         try {
             String fileName = "pet_" + System.currentTimeMillis() + ".jpg";

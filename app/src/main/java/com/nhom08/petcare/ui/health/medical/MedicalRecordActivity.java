@@ -24,6 +24,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Activity hiển thị danh sách hồ sơ y tế của thú cưng.
+ * Cho phép xem tóm tắt thông tin thú cưng (tên, ngày sinh, cân nặng hiện tại) 
+ * và danh sách các lần thăm khám y tế đã được ghi nhận.
+ */
 public class MedicalRecordActivity extends AppCompatActivity {
 
     private ActivityMedicalRecordBinding binding;
@@ -42,21 +47,24 @@ public class MedicalRecordActivity extends AppCompatActivity {
         repo    = new HoSoYTeRepository(this);
         petRepo = new PetRepository(this);
 
-        // Ưu tiên pet_id từ Intent (khi mở từ PetProfileActivity)
-        // Fallback về PetManager (khi mở từ HealthFragment)
+        // Xác định ID thú cưng cần xem hồ sơ y tế
         petId = getIntent().getStringExtra("pet_id");
         if (petId == null || petId.isEmpty()) {
             petId = PetManager.getInstance(this).getCurrentPetId();
         }
 
         binding.btnBack.setOnClickListener(v -> finish());
+        
+        // Mở màn hình thêm hồ sơ y tế mới
         binding.btnAddRecord.setOnClickListener(v -> {
             Intent intent = new Intent(this, AddMedicalRecordActivity.class);
-            intent.putExtra("pet_id", petId); // truyền pet_id sang màn thêm
+            intent.putExtra("pet_id", petId);
             startActivity(intent);
         });
 
+        // Cấu hình adapter cho danh sách hồ sơ y tế
         adapter = new MedicalRecordAdapter(list, item -> {
+            // Mở chi tiết hồ sơ y tế khi người dùng nhấn vào một item
             Intent intent = new Intent(this, MedicalRecordDetailActivity.class);
             intent.putExtra("record_id", item.id);
             startActivity(intent);
@@ -71,9 +79,13 @@ public class MedicalRecordActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        // Cập nhật danh sách hồ sơ y tế mỗi khi quay lại màn hình
         loadData();
     }
 
+    /**
+     * Tải thông tin thú cưng để hiển thị ở phần Header.
+     */
     private void loadPetInfo() {
         if (petId == null || petId.isEmpty()) return;
         petRepo.getPetById(petId, pet -> runOnUiThread(() -> {
@@ -81,12 +93,13 @@ public class MedicalRecordActivity extends AppCompatActivity {
             binding.tvPetName.setText(pet.tenThuCung != null ? pet.tenThuCung : "");
             binding.tvPetAge.setText(pet.ngaySinh != null && !pet.ngaySinh.isEmpty()
                     ? "Ngày sinh: " + pet.ngaySinh : "Ngày sinh: Chưa có");
+            
+            // Truy vấn cân nặng mới nhất từ lịch sử cân nặng
             new Thread(() -> {
                 CanNangDao canNangDao = AppDatabase.getInstance(getApplicationContext()).canNangDao();
                 List<CanNang> weightRecords = canNangDao.getAllByPet(petId);
 
                 if (weightRecords != null && !weightRecords.isEmpty()) {
-                    // Sắp xếp danh sách giảm dần (Ngày mới nhất lên đầu)
                     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
                     Collections.sort(weightRecords, (c1, c2) -> {
                         try {
@@ -101,17 +114,15 @@ public class MedicalRecordActivity extends AppCompatActivity {
                         return 0;
                     });
 
-                    // Lấy cân nặng của bản ghi đầu tiên (mới nhất)
                     float latestWeight = weightRecords.get(0).canNang;
                     runOnUiThread(() -> binding.tvPetWeight.setText("Cân nặng: " + latestWeight + " kg"));
                 } else {
-                    // Nếu chưa từng nhập lịch sử cân nặng nào, lấy tạm cân nặng gốc trong bảng ThuCung
                     runOnUiThread(() -> binding.tvPetWeight.setText(pet.canNang > 0
                             ? "Cân nặng: " + pet.canNang + " kg" : "Cân nặng: Chưa có"));
                 }
             }).start();
 
-            // --- ĐOẠN SỬA ---
+            // Hiển thị ảnh thú cưng
             if (pet.anhUrl != null && !pet.anhUrl.isEmpty()) {
                 if (pet.anhUrl.startsWith("http")) {
                     Glide.with(this)
@@ -129,10 +140,12 @@ public class MedicalRecordActivity extends AppCompatActivity {
             } else {
                 binding.imgPet.setImageResource(R.drawable.pet_welcome);
             }
-            // ----------------
         }));
     }
 
+    /**
+     * Tải danh sách hồ sơ y tế của thú cưng từ database.
+     */
     private void loadData() {
         if (petId == null || petId.isEmpty()) {
             Toast.makeText(this, "Chưa chọn thú cưng", Toast.LENGTH_SHORT).show();

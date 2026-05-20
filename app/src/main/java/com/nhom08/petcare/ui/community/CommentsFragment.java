@@ -21,6 +21,10 @@ import com.nhom08.petcare.databinding.FragmentCommentsBinding;
 
 import java.util.*;
 
+/**
+ * Fragment quản lý phần bình luận của một bài viết.
+ * Hiển thị danh sách bình luận từ Firebase và cho phép người dùng gửi bình luận mới.
+ */
 public class CommentsFragment extends Fragment {
 
     private static final String DB_URL = "https://petcare-1ce14-default-rtdb.asia-southeast1.firebasedatabase.app";
@@ -30,6 +34,9 @@ public class CommentsFragment extends Fragment {
     private final List<Comment> list = new ArrayList<>();
     private RecyclerView.Adapter<?> adapter;
 
+    /**
+     * Model đại diện cho một bình luận.
+     */
     public static class Comment {
         public String userName, content, avatarUrl;
         public long timestamp;
@@ -42,21 +49,27 @@ public class CommentsFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         binding = FragmentCommentsBinding.inflate(inflater, container, false);
 
+        // Lấy postId từ Arguments được truyền vào
         String postId = getArguments() != null ? getArguments().getString("postId") : null;
         if (postId == null) {
             Toast.makeText(getContext(), "Không tìm thấy bài viết", Toast.LENGTH_SHORT).show();
             return binding.getRoot();
         }
 
+        // Tham chiếu đến node của bài viết trên Firebase
         postRef = FirebaseDatabase.getInstance(DB_URL).getReference("posts").child(postId);
 
         setupRecyclerView();
         listenForComments();
 
+        // Sự kiện gửi bình luận
         binding.btnSendComment.setOnClickListener(v -> sendComment());
         return binding.getRoot();
     }
 
+    /**
+     * Thiết lập RecyclerView để hiển thị danh sách các bình luận.
+     */
     private void setupRecyclerView() {
         binding.rvComments.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -75,7 +88,7 @@ public class CommentsFragment extends Fragment {
                 ((TextView) h.itemView.findViewById(R.id.tvUserName)).setText(c.userName);
                 ((TextView) h.itemView.findViewById(R.id.tvComment)).setText(c.content);
 
-                // Load avatar
+                // Tải ảnh đại diện của người bình luận
                 de.hdodenhof.circleimageview.CircleImageView imgAvatar =
                         h.itemView.findViewById(R.id.imgAvatar);
                 if (c.avatarUrl != null && !c.avatarUrl.isEmpty()) {
@@ -96,16 +109,20 @@ public class CommentsFragment extends Fragment {
         binding.rvComments.setAdapter(adapter);
     }
 
+    /**
+     * Lắng nghe danh sách bình luận từ Firebase theo thời gian thực.
+     */
     private void listenForComments() {
         postRef.child("comments_data").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 list.clear();
                 for (DataSnapshot d : snapshot.getChildren()) {
-                    if (!d.hasChildren()) continue; // bỏ qua node String rỗng cũ
+                    if (!d.hasChildren()) continue; // Bỏ qua các node không hợp lệ
                     Comment c = d.getValue(Comment.class);
                     if (c != null) list.add(c);
                 }
+                // Sắp xếp bình luận theo thời gian (cũ trước mới sau)
                 list.sort((a, b) -> Long.compare(a.timestamp, b.timestamp));
                 adapter.notifyDataSetChanged();
             }
@@ -118,6 +135,10 @@ public class CommentsFragment extends Fragment {
         });
     }
 
+    /**
+     * Gửi bình luận của người dùng hiện tại lên Firebase.
+     * Cập nhật đồng thời số lượng bình luận (comments_count) của bài viết.
+     */
     private void sendComment() {
         if (binding == null) return;
 
@@ -135,6 +156,7 @@ public class CommentsFragment extends Fragment {
 
         binding.btnSendComment.setEnabled(false);
 
+        // Lấy thông tin cá nhân (Tên và Avatar) của người dùng hiện tại để gán vào bình luận
         FirebaseDatabase.getInstance(DB_URL).getReference("users").child(uid).get()
                 .addOnSuccessListener(snapshot -> {
                     String name = snapshot.child("displayName").getValue(String.class);
@@ -147,12 +169,14 @@ public class CommentsFragment extends Fragment {
 
                     Map<String, Object> data = new HashMap<>();
                     data.put("userName", finalName);
-                    data.put("avatarUrl", finalAvatar);  // Lưu avatar vào comment
+                    data.put("avatarUrl", finalAvatar);
                     data.put("content", text);
                     data.put("timestamp", System.currentTimeMillis());
 
+                    // Thêm bình luận vào node "comments_data"
                     postRef.child("comments_data").push().setValue(data)
                             .addOnSuccessListener(aVoid -> {
+                                // Sử dụng Transaction để tăng số lượng bình luận một cách an toàn
                                 postRef.child("comments_count").runTransaction(new Transaction.Handler() {
                                     @NonNull
                                     @Override

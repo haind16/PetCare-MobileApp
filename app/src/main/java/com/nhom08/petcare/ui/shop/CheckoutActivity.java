@@ -13,7 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide; // Cần import thư viện Glide
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -32,6 +32,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+/**
+ * Activity xử lý thanh toán và đặt hàng.
+ * Hiển thị tóm tắt đơn hàng, thông tin vận chuyển và lựa chọn phương thức thanh toán.
+ */
 public class CheckoutActivity extends AppCompatActivity {
 
     private static final String DB_URL  = "https://petcare-1ce14-default-rtdb.asia-southeast1.firebasedatabase.app";
@@ -65,9 +69,9 @@ public class CheckoutActivity extends AppCompatActivity {
         binding.btnConfirm.setEnabled(true);
     }
 
-    // ----------------------------------------------------------------
-    // Load thông tin khách hàng từ Firebase
-    // ----------------------------------------------------------------
+    /**
+     * Tải thông tin người nhận hàng (Tên, SĐT, Địa chỉ) từ Firebase.
+     */
     private void loadCustomerInfo() {
         String userId = getCurrentUserId();
         if (userId == null) return;
@@ -100,17 +104,14 @@ public class CheckoutActivity extends AppCompatActivity {
                 });
     }
 
-    // ----------------------------------------------------------------
-    // RecyclerView danh sách sản phẩm (read-only)
-    // ----------------------------------------------------------------
     private void setupOrderItemsRecyclerView() {
         binding.rvOrderItems.setLayoutManager(new LinearLayoutManager(this));
         binding.rvOrderItems.setNestedScrollingEnabled(false);
     }
 
-    // ----------------------------------------------------------------
-    // Load giỏ hàng từ Firebase
-    // ----------------------------------------------------------------
+    /**
+     * Tải danh sách sản phẩm từ giỏ hàng để hiển thị trong đơn hàng.
+     */
     private void loadCartAndUpdateUI() {
         String userId = getCurrentUserId();
         if (userId == null) return;
@@ -159,9 +160,9 @@ public class CheckoutActivity extends AppCompatActivity {
         binding.tvTotal.setText(formatVnd(tongTienSanPham + PHI_SHIP));
     }
 
-    // ----------------------------------------------------------------
-    // Xử lý xác nhận đặt hàng
-    // ----------------------------------------------------------------
+    /**
+     * Xử lý xác nhận đặt hàng. Kiểm tra thông tin liên lạc trước khi lưu.
+     */
     private void handleConfirm() {
         if (cartItems.isEmpty()) {
             Toast.makeText(this, "Giỏ hàng trống, vui lòng thêm sản phẩm!", Toast.LENGTH_SHORT).show();
@@ -185,9 +186,9 @@ public class CheckoutActivity extends AppCompatActivity {
         saveOrder(userId);
     }
 
-    // ----------------------------------------------------------------
-    // Lưu đơn hàng lên Firebase
-    // ----------------------------------------------------------------
+    /**
+     * Lưu thông tin đơn hàng vào node "orders" trên Firebase và xóa giỏ hàng nếu thanh toán COD.
+     */
     private void saveOrder(String userId) {
         List<Map<String, Object>> danhSach = new ArrayList<>();
         for (CartAdapter.CartItem item : cartItems) {
@@ -196,7 +197,7 @@ public class CheckoutActivity extends AppCompatActivity {
             sp.put("gia",       item.gia);
             sp.put("soLuong",   item.quantity);
             sp.put("thanhTien", item.gia * item.quantity);
-            sp.put("anhUrl",    item.anhUrl); // <-- LƯU ẢNH VÀO ĐƠN HÀNG ĐỂ DÙNG SAU NÀY
+            sp.put("anhUrl",    item.anhUrl);
             danhSach.add(sp);
         }
 
@@ -228,6 +229,7 @@ public class CheckoutActivity extends AppCompatActivity {
                     } else if ("bank".equals(selectedPayment)) {
                         startActivity(new Intent(this, BankTransferActivity.class));
                     } else {
+                        // Nếu là COD thì xóa giỏ hàng luôn
                         cartRef.removeValue().addOnSuccessListener(unused2 -> {
                             Toast.makeText(this, "Đặt hàng thành công!", Toast.LENGTH_LONG).show();
                             goBackToShop();
@@ -240,9 +242,9 @@ public class CheckoutActivity extends AppCompatActivity {
                 });
     }
 
-    // ----------------------------------------------------------------
-    // Setup phương thức thanh toán
-    // ----------------------------------------------------------------
+    /**
+     * Thiết lập giao diện và sự kiện chọn phương thức thanh toán.
+     */
     private void setupPaymentOptions() {
         binding.rbCOD.setBackgroundResource(R.drawable.bg_payment_selected);
         binding.rbBank.setBackgroundResource(R.drawable.edit_text_border);
@@ -293,10 +295,10 @@ public class CheckoutActivity extends AppCompatActivity {
         finish();
     }
 
-    // ----------------------------------------------------------------
-    // Adapter hiển thị sản phẩm trong checkout (Đã cập nhật Glide)
-    // ----------------------------------------------------------------
-    private class OrderItemAdapter extends RecyclerView.Adapter<OrderItemAdapter.VH> { // Bỏ chữ static
+    /**
+     * Adapter nội bộ hiển thị các sản phẩm trong đơn hàng tại màn hình thanh toán.
+     */
+    private class OrderItemAdapter extends RecyclerView.Adapter<OrderItemAdapter.VH> {
 
         private final List<CartAdapter.CartItem> list;
 
@@ -319,11 +321,11 @@ public class CheckoutActivity extends AppCompatActivity {
                             .format(item.gia).replace(",", ".") + "đ");
             holder.tvQty.setText("x" + item.quantity);
 
+            // Ẩn các nút điều chỉnh số lượng ở màn hình thanh toán
             holder.btnPlus.setVisibility(View.GONE);
             holder.btnMinus.setVisibility(View.GONE);
             holder.btnDelete.setVisibility(View.GONE);
 
-            // Dùng Glide tải ảnh vào imgProduct
             Glide.with(holder.itemView.getContext())
                     .load(item.anhUrl)
                     .placeholder(R.drawable.pet_welcome)
@@ -337,7 +339,7 @@ public class CheckoutActivity extends AppCompatActivity {
         class VH extends RecyclerView.ViewHolder {
             TextView tvName, tvPrice, tvQty;
             View     btnPlus, btnMinus, btnDelete;
-            ImageView imgProduct; // Thêm biến chứa ImageView
+            ImageView imgProduct;
 
             VH(View v) {
                 super(v);
@@ -347,7 +349,7 @@ public class CheckoutActivity extends AppCompatActivity {
                 btnPlus   = v.findViewById(R.id.btnPlus);
                 btnMinus  = v.findViewById(R.id.btnMinus);
                 btnDelete = v.findViewById(R.id.btnDelete);
-                imgProduct = v.findViewById(R.id.imgProduct); // Ánh xạ ID
+                imgProduct = v.findViewById(R.id.imgProduct);
             }
         }
     }

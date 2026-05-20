@@ -22,8 +22,16 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+/**
+ * Adapter quản lý việc hiển thị danh sách bài viết trong cộng đồng.
+ * Xử lý việc hiển thị nội dung bài viết, hình ảnh, thời gian đăng, 
+ * và các tương tác như Like, xem bình luận.
+ */
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder> {
 
+    /**
+     * Model đại diện cho một bài đăng.
+     */
     public static class PostItem {
         public String postId, userName, content, imageUrl, avatarUrl;
         public long timestamp, likes, comments_count;
@@ -68,7 +76,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         holder.tvCommentCount.setText(String.valueOf(item.comments_count));
         holder.tvTime.setText(formatTime(item.timestamp));
 
-        // Load avatar người đăng
+        // Tải ảnh đại diện người đăng
         if (item.avatarUrl != null && !item.avatarUrl.isEmpty()) {
             Glide.with(holder.itemView.getContext())
                     .load(item.avatarUrl)
@@ -79,12 +87,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
             holder.imgAvatar.setImageResource(R.drawable.pet_welcome);
         }
 
-        // Load ảnh bài đăng — hỗ trợ cả URL Cloudinary (https://) và File Internal
+        // Tải hình ảnh bài đăng (Hỗ trợ URL Cloudinary và ảnh Local)
         if (item.imageUrl != null && !item.imageUrl.isEmpty()) {
             holder.imgPost.setVisibility(View.VISIBLE);
             Object imageSource = item.imageUrl.startsWith("http")
-                    ? item.imageUrl          // URL Cloudinary
-                    : new File(item.imageUrl); // File Internal (ảnh cũ)
+                    ? item.imageUrl
+                    : new File(item.imageUrl);
             Glide.with(holder.itemView.getContext())
                     .load(imageSource)
                     .into(holder.imgPost);
@@ -92,7 +100,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
             holder.imgPost.setVisibility(View.GONE);
         }
 
-        // Lắng nghe trạng thái like của user hiện tại
+        // Lắng nghe và cập nhật trạng thái Like của bài viết theo thời gian thực
         DatabaseReference postRef = db.child("posts").child(item.postId);
         postRef.child("userLikes").child(myUid).addValueEventListener(new ValueEventListener() {
             @Override
@@ -106,14 +114,13 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
             @Override public void onCancelled(@NonNull DatabaseError e) {}
         });
 
-        // Nút like
+        // Xử lý sự kiện khi nhấn nút Like
         holder.btnLike.setOnClickListener(v -> {
             if (!item.isLiked) {
                 db.child("users").child(myUid).get().addOnSuccessListener(s -> {
                     String name   = s.child("displayName").getValue(String.class);
                     String avatar = s.child("avatarUrl").getValue(String.class);
 
-                    // Lưu object {name, avatarUrl} thay vì chỉ String tên
                     Map<String, Object> likeData = new java.util.HashMap<>();
                     likeData.put("name",      name != null && !name.isEmpty() ? name : "Thành viên");
                     likeData.put("avatarUrl", avatar != null ? avatar : "");
@@ -127,12 +134,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
             }
         });
 
-        // Click vào item → mở PostDetail tab Thích
+        // Mở chi tiết bài viết
         holder.itemView.setOnClickListener(v -> {
             if (postClickListener != null) postClickListener.onClick(item);
         });
 
-        // Click vào nút bình luận → mở PostDetail tab Bình luận
+        // Chuyển trực tiếp đến phần bình luận
         holder.btnComment.setOnClickListener(v -> {
             if (commentClickListener != null) commentClickListener.onClick(item);
         });
@@ -161,6 +168,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         }
     }
 
+    /**
+     * Chuyển đổi timestamp sang chuỗi thời gian thân thiện (vừa xong, phút trước, ngày trước...).
+     */
     private String formatTime(long timestamp) {
         if (timestamp == 0) return "";
         long now  = System.currentTimeMillis();

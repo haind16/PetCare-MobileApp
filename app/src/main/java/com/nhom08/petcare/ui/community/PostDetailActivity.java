@@ -19,6 +19,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+/**
+ * Activity hiển thị chi tiết bài viết trong cộng đồng.
+ * Bao gồm: Nội dung bài viết, hình ảnh, thông tin người đăng, số lượng cảm xúc và bình luận.
+ * Sử dụng ViewPager2 và TabLayout để chuyển đổi giữa danh sách người thích và danh sách bình luận.
+ */
 public class PostDetailActivity extends AppCompatActivity {
 
     private ActivityPostDetailBinding binding;
@@ -34,6 +39,7 @@ public class PostDetailActivity extends AppCompatActivity {
         postId = getIntent().getStringExtra("postId");
         if (postId == null) { finish(); return; }
 
+        // Tham chiếu đến bài viết cụ thể trên Firebase
         postRef = FirebaseDatabase.getInstance(
                 "https://petcare-1ce14-default-rtdb.asia-southeast1.firebasedatabase.app"
         ).getReference("posts").child(postId);
@@ -44,6 +50,9 @@ public class PostDetailActivity extends AppCompatActivity {
         listenToPostChanges();
     }
 
+    /**
+     * Thiết lập ViewPager2 để hiển thị 2 Fragment: LikesFragment và CommentsFragment.
+     */
     private void setupViewPager() {
         binding.viewPager.setAdapter(new FragmentStateAdapter(this) {
             @Override public int getItemCount() { return 2; }
@@ -56,17 +65,21 @@ public class PostDetailActivity extends AppCompatActivity {
             }
         });
 
+        // Kết nối TabLayout với ViewPager2
         new TabLayoutMediator(binding.tabLayout, binding.viewPager,
                 (tab, pos) -> tab.setText(pos == 0 ? "Thích" : "Bình luận")
         ).attach();
 
-        // Nếu được mở từ nút bình luận → nhảy thẳng sang tab Bình luận
+        // Nếu được mở từ nút bình luận → tự động chuyển sang tab Bình luận
         boolean navToComments = getIntent().getBooleanExtra("nav_to_comments", false);
         if (navToComments) {
             binding.viewPager.post(() -> binding.viewPager.setCurrentItem(1, false));
         }
     }
 
+    /**
+     * Theo dõi sự thay đổi của bài viết trên Firebase để cập nhật giao diện thời gian thực.
+     */
     private void listenToPostChanges() {
         postRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -83,11 +96,11 @@ public class PostDetailActivity extends AppCompatActivity {
                 binding.tvLikeCount.setText(String.valueOf(likes != null ? likes : 0));
                 binding.tvCommentCount.setText(String.valueOf(cmts != null ? cmts : 0));
 
-                // Hiện thời gian đăng
+                // Hiển thị thời gian đăng bài
                 Long ts = snapshot.child("timestamp").getValue(Long.class);
                 binding.tvTime.setText(ts != null ? formatTime(ts) : "");
 
-                // Load avatar
+                // Tải ảnh đại diện người đăng
                 if (avatarUrl != null && !avatarUrl.isEmpty()) {
                     Glide.with(PostDetailActivity.this)
                             .load(avatarUrl)
@@ -98,7 +111,7 @@ public class PostDetailActivity extends AppCompatActivity {
                     binding.imgAvatar.setImageResource(R.drawable.pet_welcome);
                 }
 
-                // Load ảnh bài đăng
+                // Tải hình ảnh của bài viết
                 if (img != null && !img.isEmpty()) {
                     binding.imgPost.setVisibility(View.VISIBLE);
                     Object imageSource = img.startsWith("http") ? img : new File(img);
@@ -107,7 +120,7 @@ public class PostDetailActivity extends AppCompatActivity {
                     binding.imgPost.setVisibility(View.GONE);
                 }
 
-                // Cập nhật tiêu đề tab
+                // Cập nhật số lượng hiển thị trên tiêu đề Tab
                 if (binding.tabLayout.getTabAt(0) != null)
                     binding.tabLayout.getTabAt(0).setText("Thích (" + (likes != null ? likes : 0) + ")");
                 if (binding.tabLayout.getTabAt(1) != null)
@@ -118,6 +131,9 @@ public class PostDetailActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Định dạng timestamp sang chuỗi thời gian hiển thị thân thiện.
+     */
     private String formatTime(long timestamp) {
         long now  = System.currentTimeMillis();
         long diff = now - timestamp;

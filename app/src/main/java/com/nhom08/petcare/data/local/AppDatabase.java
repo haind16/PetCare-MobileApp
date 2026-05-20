@@ -7,6 +7,10 @@ import androidx.room.RoomDatabase;
 import com.nhom08.petcare.data.local.dao.*;
 import com.nhom08.petcare.data.model.*;
 
+/**
+ * Lớp quản lý cơ sở dữ liệu Room (SQLite local).
+ * Chứa các bảng (Entities) liên quan đến quản lý sức khỏe, nhắc nhở và hồ sơ thú cưng.
+ */
 @Database(
         entities = {
                 ThuCung.class,
@@ -27,7 +31,7 @@ public abstract class AppDatabase extends RoomDatabase {
 
     private static AppDatabase instance;
 
-    // Khai báo tất cả DAO
+    // Khai báo các Data Access Object (DAO) để thao tác với dữ liệu
     public abstract ThuCungDao thuCungDao();
     public abstract LichTiemPhongDao lichTiemPhongDao();
     public abstract CanNangDao canNangDao();
@@ -39,7 +43,11 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract NhatKyDao nhatKyDao();
     public abstract HoSoYTeDao hoSoYTeDao();
 
-    // Singleton — chỉ tạo 1 lần
+    /**
+     * Singleton Pattern để đảm bảo chỉ có duy nhất một instance của database trong suốt vòng đời ứng dụng.
+     * @param context Context của ứng dụng
+     * @return Instance của AppDatabase
+     */
     public static synchronized AppDatabase getInstance(Context context) {
         if (instance == null) {
             instance = Room.databaseBuilder(
@@ -47,7 +55,7 @@ public abstract class AppDatabase extends RoomDatabase {
                             AppDatabase.class,
                             "petcare_db"
                     )
-                    .fallbackToDestructiveMigration()
+                    .fallbackToDestructiveMigration() // Xóa và tạo lại database nếu version thay đổi mà không có migration
                     .build();
         }
         return instance;

@@ -28,6 +28,11 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Activity hiển thị thống kê sức khỏe của thú cưng.
+ * Sử dụng thư viện MPAndroidChart để vẽ biểu đồ đường (LineChart) cho cân nặng
+ * và biểu đồ cột (BarChart) cho mức độ hoạt động/nhật ký trong tuần.
+ */
 public class HealthStatisticsActivity extends AppCompatActivity {
 
     private ActivityHealthStatisticsBinding binding;
@@ -41,35 +46,46 @@ public class HealthStatisticsActivity extends AppCompatActivity {
         binding = ActivityHealthStatisticsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        // Khởi tạo DAO từ Room Database
         canNangDao = AppDatabase.getInstance(this).canNangDao();
         nhatKyDao  = AppDatabase.getInstance(this).nhatKyDao();
+        
+        // Lấy ID thú cưng đang được chọn từ PetManager
         petId      = PetManager.getInstance(this).getCurrentPetId();
 
         binding.btnBack.setOnClickListener(v -> finish());
 
+        // Chuyển hướng xem chi tiết lịch sử cân nặng
         binding.btnWeightDetail.setOnClickListener(v -> {
             Intent i = new Intent(this, WeightActivity.class);
             i.putExtra("pet_id", petId);
             startActivity(i);
         });
 
+        // Chuyển hướng xem chi tiết nhật ký hoạt động
         binding.btnActivityDetail.setOnClickListener(v ->
                 startActivity(new Intent(this, DiaryActivity.class)));
 
+        // Tải dữ liệu và hiển thị biểu đồ
         loadWeightChart();
         loadActivityChart();
     }
 
-    // ── BIỂU ĐỒ CÂN NẶNG ────────────────────────────────────────────────────
+    // ── BIỂU ĐỒ CÂN NẶNG (LINE CHART) ────────────────────────────────────────
 
+    /**
+     * Truy vấn dữ liệu cân nặng từ Room và hiển thị lên LineChart.
+     */
     private void loadWeightChart() {
         if (petId == null) { setupEmptyLineChart(); return; }
 
         new Thread(() -> {
+            // Lấy danh sách ghi chép cân nặng của thú cưng
             List<CanNang> records = canNangDao.getAllByPet(petId);
             runOnUiThread(() -> {
                 if (records.isEmpty()) { setupEmptyLineChart(); return; }
 
+                // Sắp xếp bản ghi theo thời gian
                 SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
                 Collections.sort(records, (c1, c2) -> {
                     try {
@@ -80,6 +96,7 @@ public class HealthStatisticsActivity extends AppCompatActivity {
                     return 0;
                 });
 
+                // Chỉ lấy tối đa 12 bản ghi gần nhất để hiển thị
                 int start = Math.max(0, records.size() - 12);
                 List<CanNang> recent = records.subList(start, records.size());
 
@@ -92,6 +109,7 @@ public class HealthStatisticsActivity extends AppCompatActivity {
                             ? ngay.substring(0, 5) : ngay);
                 }
 
+                // Tính toán sự thay đổi cân nặng (tăng/giảm)
                 if (recent.size() >= 2) {
                     float first = recent.get(0).canNang;
                     float last  = recent.get(recent.size() - 1).canNang;
@@ -110,6 +128,9 @@ public class HealthStatisticsActivity extends AppCompatActivity {
         }).start();
     }
 
+    /**
+     * Cấu hình UI và đổ dữ liệu vào biểu đồ đường.
+     */
     private void renderLineChart(List<Entry> entries, List<String> labels) {
         LineChart chart = binding.lineChartWeight;
 
@@ -120,7 +141,7 @@ public class HealthStatisticsActivity extends AppCompatActivity {
         dataSet.setCircleRadius(4f);
         dataSet.setDrawValues(true);
         dataSet.setValueTextSize(9f);
-        dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+        dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER); // Làm mượt đường nối
         dataSet.setDrawFilled(true);
         dataSet.setFillColor(0xFF4FC3F7);
         dataSet.setFillAlpha(30);
@@ -151,8 +172,11 @@ public class HealthStatisticsActivity extends AppCompatActivity {
         binding.tvWeightDate.setText("Chưa có dữ liệu");
     }
 
-    // ── BIỂU ĐỒ HOẠT ĐỘNG TRONG TUẦN ────────────────────────────────────────
+    // ── BIỂU ĐỒ HOẠT ĐỘNG TRONG TUẦN (BAR CHART) ────────────────────────────────
 
+    /**
+     * Thống kê số lượng hoạt động nhật ký trong tuần hiện tại.
+     */
     private void loadActivityChart() {
         if (petId == null) { setupEmptyBarChart(); return; }
 
@@ -161,7 +185,7 @@ public class HealthStatisticsActivity extends AppCompatActivity {
             runOnUiThread(() -> {
                 if (allDiary.isEmpty()) { setupEmptyBarChart(); return; }
 
-                // Tìm T2 đầu tuần hiện tại
+                // Tìm ngày Thứ Hai đầu tuần hiện tại để lọc dữ liệu trong tuần
                 Calendar today = Calendar.getInstance();
                 Calendar monday = (Calendar) today.clone();
                 monday.set(Calendar.HOUR_OF_DAY, 0);
@@ -169,15 +193,14 @@ public class HealthStatisticsActivity extends AppCompatActivity {
                 monday.set(Calendar.SECOND, 0);
                 monday.set(Calendar.MILLISECOND, 0);
 
-                // DAY_OF_WEEK: CN=1, T2=2, T3=3...T7=7
                 int dow = monday.get(Calendar.DAY_OF_WEEK);
                 if (dow == Calendar.SUNDAY) {
-                    monday.add(Calendar.DAY_OF_MONTH, -6); // CN → lùi 6 ngày về T2
+                    monday.add(Calendar.DAY_OF_MONTH, -6);
                 } else {
-                    monday.add(Calendar.DAY_OF_MONTH, -(dow - Calendar.MONDAY)); // T2-T7 → lùi về T2
+                    monday.add(Calendar.DAY_OF_MONTH, -(dow - Calendar.MONDAY));
                 }
 
-                // Tạo mảng đếm T2→CN
+                // Mảng lưu số lượng hoạt động từ T2 đến CN
                 String[] dayLabels = {"T2", "T3", "T4", "T5", "T6", "T7", "CN"};
                 float[] counts = new float[7];
 
@@ -195,6 +218,9 @@ public class HealthStatisticsActivity extends AppCompatActivity {
         }).start();
     }
 
+    /**
+     * Cấu hình UI và hiển thị biểu đồ cột.
+     */
     private void renderBarChart(List<BarEntry> entries, String[] labels) {
         BarChart chart = binding.barChartActivity;
 
@@ -232,10 +258,7 @@ public class HealthStatisticsActivity extends AppCompatActivity {
     }
 
     /**
-     * Lấy index ngày trong tuần (0=T2 ... 6=CN) từ chuỗi ngay của NhatKy.
-     * Hỗ trợ 2 format:
-     *   - "dd/MM/yyyy"
-     *   - "Vào Thứ X, ngày D tháng M năm Y"
+     * Xác định chỉ số ngày trong tuần (0-6) từ chuỗi ngày lưu trong Database.
      */
     private int getDayIndexInWeek(String ngay, Calendar monday) {
         if (ngay == null || ngay.isEmpty()) return -1;
@@ -243,14 +266,13 @@ public class HealthStatisticsActivity extends AppCompatActivity {
             Calendar cal = Calendar.getInstance();
 
             if (ngay.contains("/")) {
-                // Format dd/MM/yyyy
+                // Định dạng chuẩn dd/MM/yyyy
                 String[] parts = ngay.split("/");
                 cal.set(Integer.parseInt(parts[2].trim()),
                         Integer.parseInt(parts[1].trim()) - 1,
                         Integer.parseInt(parts[0].trim()));
             } else if (ngay.contains("tháng") && ngay.contains("năm 20")) {
-                // Format "Vào Thứ X, ngày D tháng M năm Y"
-                // Dùng regex lấy 3 số cuối: ngày, tháng, năm
+                // Định dạng mô tả "Vào Thứ X, ngày D tháng M năm Y"
                 java.util.regex.Matcher m = java.util.regex.Pattern
                         .compile("ngày\\s+(\\d+)\\s+tháng\\s+(\\d+)\\s+năm\\s+(\\d+)")
                         .matcher(ngay);
@@ -268,6 +290,7 @@ public class HealthStatisticsActivity extends AppCompatActivity {
             cal.set(Calendar.SECOND, 0);
             cal.set(Calendar.MILLISECOND, 0);
 
+            // Tính toán khoảng cách ngày so với ngày Thứ Hai đầu tuần
             long diffMs  = cal.getTimeInMillis() - monday.getTimeInMillis();
             int diffDays = (int) (diffMs / (1000L * 60 * 60 * 24));
             return (diffDays >= 0 && diffDays < 7) ? diffDays : -1;

@@ -19,8 +19,15 @@ import com.nhom08.petcare.R;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Fragment hiển thị danh sách những người dùng đã thích (like) một bài viết.
+ * Dữ liệu được lấy từ Firebase Realtime Database dưới node "userLikes" của bài viết đó.
+ */
 public class LikesFragment extends Fragment {
 
+    /**
+     * Model đại diện cho một lượt thích.
+     */
     private static class LikeItem {
         String name, avatarUrl;
     }
@@ -38,13 +45,16 @@ public class LikesFragment extends Fragment {
         rv.setHasFixedSize(true);
         rv.setNestedScrollingEnabled(true);
 
+        // Lấy postId từ Arguments
         String postId = getArguments() != null ? getArguments().getString("postId") : null;
         if (postId == null) return view;
 
+        // Tham chiếu đến danh sách người thích của bài viết trên Firebase
         DatabaseReference likesRef = FirebaseDatabase.getInstance(
                 "https://petcare-1ce14-default-rtdb.asia-southeast1.firebasedatabase.app"
         ).getReference("posts").child(postId).child("userLikes");
 
+        // Thiết lập Adapter hiển thị danh sách người thích
         adapter = new RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             @NonNull
             @Override
@@ -59,7 +69,7 @@ public class LikesFragment extends Fragment {
                 LikeItem item = list.get(position);
                 ((TextView) h.itemView.findViewById(R.id.tvUserName)).setText(item.name);
 
-                // Load avatar
+                // Tải avatar người dùng đã thích
                 de.hdodenhof.circleimageview.CircleImageView imgAvatar =
                         h.itemView.findViewById(R.id.imgAvatar);
                 if (item.avatarUrl != null && !item.avatarUrl.isEmpty()) {
@@ -78,18 +88,19 @@ public class LikesFragment extends Fragment {
         };
         rv.setAdapter(adapter);
 
+        // Lắng nghe thay đổi danh sách thích từ Firebase
         likesRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 list.clear();
                 for (DataSnapshot d : snapshot.getChildren()) {
                     LikeItem item = new LikeItem();
-                    // Hỗ trợ cả dữ liệu cũ (String) và mới (Object {name, avatarUrl})
+                    // Xử lý cả hai định dạng dữ liệu: Object mới (có name, avatar) và String cũ
                     if (d.hasChildren()) {
                         item.name      = d.child("name").getValue(String.class);
                         item.avatarUrl = d.child("avatarUrl").getValue(String.class);
                     } else {
-                        item.name      = d.getValue(String.class); // dữ liệu cũ
+                        item.name      = d.getValue(String.class);
                         item.avatarUrl = "";
                     }
                     if (item.name != null) list.add(item);

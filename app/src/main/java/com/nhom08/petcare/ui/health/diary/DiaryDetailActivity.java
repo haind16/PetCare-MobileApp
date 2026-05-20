@@ -13,13 +13,17 @@ import com.nhom08.petcare.utils.PetManager;
 
 import java.util.Calendar;
 
+/**
+ * Activity hiển thị chi tiết và cho phép chỉnh sửa/thêm mới một bản ghi nhật ký.
+ * Người dùng có thể nhập ghi chú và chọn ngày thực hiện hoạt động.
+ */
 public class DiaryDetailActivity extends AppCompatActivity {
 
     private ActivityDiaryDetailBinding binding;
     private Calendar selectedDate = Calendar.getInstance();
     private NhatKyRepository repo;
     private String petId;
-    private String recordId; // null nếu là thêm mới
+    private String recordId; // Sẽ có giá trị nếu là chỉnh sửa bản ghi cũ
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +35,7 @@ public class DiaryDetailActivity extends AppCompatActivity {
         petId    = PetManager.getInstance(this).getCurrentPetId();
         recordId = getIntent().getStringExtra("id");
 
+        // Lấy dữ liệu truyền từ Intent
         String name = getIntent().getStringExtra("name");
         String date = getIntent().getStringExtra("date");
         String note = getIntent().getStringExtra("note");
@@ -38,7 +43,7 @@ public class DiaryDetailActivity extends AppCompatActivity {
         if (name != null) binding.tvActivityName.setText(name);
         if (note != null) binding.etComment.setText(note);
 
-        // Nếu có date từ Intent (xem lại) thì parse, không thì dùng hôm nay
+        // Hiển thị ngày: Nếu là xem lại thì dùng ngày cũ, nếu thêm mới thì dùng ngày hiện tại
         if (date != null && !date.isEmpty()) {
             binding.tvDate.setText(date);
         } else {
@@ -47,6 +52,7 @@ public class DiaryDetailActivity extends AppCompatActivity {
 
         binding.btnCancel.setOnClickListener(v -> finish());
 
+        // Mở hộp thoại chọn ngày
         binding.btnEditDate.setOnClickListener(v ->
                 new DatePickerDialog(this, (view, year, month, day) -> {
                     selectedDate.set(year, month, day);
@@ -57,6 +63,7 @@ public class DiaryDetailActivity extends AppCompatActivity {
                         selectedDate.get(Calendar.DAY_OF_MONTH)).show()
         );
 
+        // Lưu thông tin nhật ký vào Room Database
         binding.btnSave.setOnClickListener(v -> {
             String comment    = binding.etComment.getText().toString().trim();
             String actName    = binding.tvActivityName.getText().toString();
@@ -68,7 +75,7 @@ public class DiaryDetailActivity extends AppCompatActivity {
             }
 
             NhatKy nk = new NhatKy();
-            if (recordId != null) nk.id = recordId; // cập nhật nếu xem lại
+            if (recordId != null) nk.id = recordId; // Gán ID cũ để Update thay vì Insert mới
             nk.petId         = petId;
             nk.loaiHoatDong  = actName;
             nk.ngay          = dateStr;
@@ -82,6 +89,9 @@ public class DiaryDetailActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Cập nhật chuỗi hiển thị ngày theo định dạng mô tả.
+     */
     private void updateDateText() {
         String[] days = {"Chủ nhật", "Thứ hai", "Thứ ba",
                 "Thứ tư", "Thứ năm", "Thứ sáu", "Thứ bảy"};

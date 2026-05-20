@@ -42,6 +42,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Fragment Trang chủ của ứng dụng.
+ * Hiển thị thông tin tổng quan của thú cưng đang được chọn (Tên, tuổi, cân nặng) 
+ * và danh sách các nhắc nhở chăm sóc sắp tới.
+ */
 public class HomeFragment extends Fragment {
 
     private FragmentHomeBinding binding;
@@ -50,6 +55,7 @@ public class HomeFragment extends Fragment {
     private ReminderAdapter reminderAdapter;
     private final List<NhacNho> reminderList = new ArrayList<>();
 
+    // Launcher để nhận kết quả khi người dùng đổi thú cưng ở màn hình PetSelector
     private final ActivityResultLauncher<Intent> petSelectorLauncher =
             registerForActivityResult(
                     new ActivityResultContracts.StartActivityForResult(),
@@ -64,10 +70,13 @@ public class HomeFragment extends Fragment {
         petRepository = new PetRepository(requireContext());
         nhacNhoRepo   = new NhacNhoRepository(requireContext());
 
+        // Nút thêm lịch nhắc nhở
         binding.btnAddSchedule.setOnClickListener(v ->
                 startActivity(new Intent(getActivity(), AddReminderActivity.class)));
+        // Nút vào màn hình tương tác (âm thanh huấn luyện)
         binding.btnInteract.setOnClickListener(v ->
                 startActivity(new Intent(getActivity(), InteractActivity.class)));
+        // Nút đổi thú cưng đang quản lý
         binding.btnChangePet.setOnClickListener(v ->
                 petSelectorLauncher.launch(new Intent(getActivity(), PetSelectorActivity.class)));
 
@@ -76,6 +85,9 @@ public class HomeFragment extends Fragment {
         return binding.getRoot();
     }
 
+    /**
+     * Thiết lập danh sách nhắc nhở chăm sóc.
+     */
     private void setupReminderRecyclerView() {
         reminderAdapter = new ReminderAdapter(reminderList);
         binding.rvReminders.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -90,6 +102,10 @@ public class HomeFragment extends Fragment {
         loadReminders();
     }
 
+    /**
+     * Tải thông tin thú cưng hiện tại từ Local Database (Room).
+     * Bao gồm tính toán tuổi dựa trên ngày sinh và lấy cân nặng ghi nhận gần nhất.
+     */
     private void loadCurrentPet() {
         if (binding == null) return;
         PetManager pm = PetManager.getInstance(requireContext());
@@ -98,13 +114,14 @@ public class HomeFragment extends Fragment {
         petRepository.getPetById(pm.getCurrentPetId(), pet -> {
             if (getActivity() == null || binding == null) return;
             new Thread(() -> {
+                // Truy vấn cân nặng gần nhất từ Room
                 CanNangDao canNangDao = AppDatabase.getInstance(requireContext()).canNangDao();
                 List<CanNang> weightRecords = canNangDao.getAllByPet(pm.getCurrentPetId());
 
-                float latestWeight = pet.canNang; // Mặc định lấy cân nặng lúc tạo hồ sơ
+                float latestWeight = pet != null ? pet.canNang : 0;
 
                 if (weightRecords != null && !weightRecords.isEmpty()) {
-                    // Sắp xếp danh sách giảm dần (Ngày mới nhất lên đầu)
+                    // Sắp xếp để lấy ngày gần đây nhất
                     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
                     Collections.sort(weightRecords, (c1, c2) -> {
                         try {
@@ -118,12 +135,9 @@ public class HomeFragment extends Fragment {
                         }
                         return 0;
                     });
-
-                    // Lấy cân nặng mới nhất
                     latestWeight = weightRecords.get(0).canNang;
                 }
 
-                // Cập nhật giao diện trên luồng chính
                 final float finalWeight = latestWeight;
                 getActivity().runOnUiThread(() -> {
                     if (binding == null) return;
@@ -132,12 +146,11 @@ public class HomeFragment extends Fragment {
                     binding.tvPetName.setText(pet.tenThuCung);
                     binding.tvPetAge.setText(tinhTuoi(pet.ngaySinh));
 
-                    // Hiển thị cân nặng mới nhất
                     binding.tvPetWeight.setText(finalWeight > 0
                             ? "Cân nặng: " + finalWeight + " kg"
                             : "Cân nặng: Chưa có");
 
-                    // Xử lý hiển thị ảnh
+                    // Xử lý hiển thị ảnh thú cưng (Hỗ trợ URL và Path local)
                     if (pet.anhUrl != null && !pet.anhUrl.isEmpty()) {
                         if (pet.anhUrl.startsWith("http")) {
                             Glide.with(requireContext())
@@ -160,6 +173,9 @@ public class HomeFragment extends Fragment {
         });
     }
 
+    /**
+     * Tải danh sách các nhắc nhở chưa hoàn thành cho thú cưng hiện tại.
+     */
     private void loadReminders() {
         if (binding == null) return;
         PetManager pm = PetManager.getInstance(requireContext());
@@ -172,7 +188,6 @@ public class HomeFragment extends Fragment {
                 reminderList.addAll(list);
                 reminderAdapter.notifyDataSetChanged();
 
-                // Ẩn/hiện trạng thái trống
                 if (list.isEmpty()) {
                     binding.tvNoReminder.setVisibility(View.VISIBLE);
                     binding.rvReminders.setVisibility(View.GONE);
@@ -184,6 +199,9 @@ public class HomeFragment extends Fragment {
         });
     }
 
+    /**
+     * Hàm helper tính tuổi thú cưng dựa trên ngày sinh.
+     */
     private String tinhTuoi(String ngaySinh) {
         if (ngaySinh == null || ngaySinh.isEmpty()) return "Tuổi: Chưa rõ";
         try {
@@ -212,7 +230,9 @@ public class HomeFragment extends Fragment {
         binding = null;
     }
 
-    // ── Adapter nhắc nhở inline ───────────────────────────────────────────────
+    /**
+     * Adapter nội bộ để hiển thị các item nhắc nhở trong HomeFragment.
+     */
     static class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.VH> {
 
         private final List<NhacNho> list;
@@ -233,7 +253,7 @@ public class HomeFragment extends Fragment {
             h.tvTitle.setText(item.loai);
             h.tvTime.setText(item.ngay + "  " + item.gio);
 
-            // Icon theo loại
+            // Gán icon và màu sắc phù hợp với từng loại nhắc nhở
             int iconRes   = R.drawable.ic_bell;
             int bgRes     = R.drawable.bg_icon_blue;
             int tintColor = 0xFF1565C0;

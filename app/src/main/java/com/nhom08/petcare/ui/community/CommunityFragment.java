@@ -23,6 +23,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Fragment hiển thị cộng đồng người nuôi thú cưng.
+ * Cho phép xem danh sách bài viết (Newsfeed), tạo bài viết mới và tương tác.
+ */
 public class CommunityFragment extends Fragment {
 
     private static final String DB_URL = "https://petcare-1ce14-default-rtdb.asia-southeast1.firebasedatabase.app";
@@ -39,12 +43,14 @@ public class CommunityFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         binding = FragmentCommunityBinding.inflate(inflater, container, false);
 
+        // Khởi tạo tham chiếu đến node "posts" trên Firebase
         postsRef = FirebaseDatabase.getInstance(DB_URL).getReference("posts");
 
         setupRecyclerView();
         listenForPosts();
         loadCurrentUserInfo();
 
+        // Xử lý sự kiện nhấn vào thanh trạng thái để tạo bài viết mới
         binding.etPostHint.setOnClickListener(v ->
                 startActivity(new Intent(getActivity(), CreatePostActivity.class)));
         binding.btnPost.setOnClickListener(v ->
@@ -53,6 +59,9 @@ public class CommunityFragment extends Fragment {
         return binding.getRoot();
     }
 
+    /**
+     * Tải thông tin người dùng hiện tại từ Firebase để hiển thị avatar ở phần đăng bài.
+     */
     private void loadCurrentUserInfo() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) return;
@@ -64,7 +73,7 @@ public class CommunityFragment extends Fragment {
                 .addOnSuccessListener(snapshot -> {
                     if (binding == null) return;
 
-                    // Load avatar vào ô đăng bài
+                    // Load avatar người dùng vào ImageView
                     String avatarUrl = snapshot.child("avatarUrl").getValue(String.class);
                     if (avatarUrl != null && !avatarUrl.isEmpty()) {
                         Glide.with(this)
@@ -76,6 +85,9 @@ public class CommunityFragment extends Fragment {
                 });
     }
 
+    /**
+     * Thiết lập RecyclerView hiển thị danh sách bài đăng.
+     */
     private void setupRecyclerView() {
         adapter = new PostAdapter(
                 postList,
@@ -87,6 +99,11 @@ public class CommunityFragment extends Fragment {
         binding.rvPosts.setAdapter(adapter);
     }
 
+    /**
+     * Chuyển sang màn hình chi tiết bài viết.
+     * @param postId ID của bài viết
+     * @param navToComments Có tự động cuộn xuống phần bình luận không
+     */
     private void openPostDetail(String postId, boolean navToComments) {
         Intent intent = new Intent(getActivity(), PostDetailActivity.class);
         intent.putExtra("postId", postId);
@@ -94,6 +111,9 @@ public class CommunityFragment extends Fragment {
         startActivity(intent);
     }
 
+    /**
+     * Lắng nghe sự thay đổi dữ liệu từ Firebase Realtime Database để cập nhật Newsfeed theo thời gian thực.
+     */
     private void listenForPosts() {
         postsRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -106,6 +126,7 @@ public class CommunityFragment extends Fragment {
                         postList.add(item);
                     }
                 }
+                // Đảo ngược danh sách để bài viết mới nhất hiện lên đầu
                 Collections.reverse(postList);
                 adapter.notifyDataSetChanged();
 

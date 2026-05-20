@@ -32,8 +32,14 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+/**
+ * Activity cho phép người dùng tạo bài viết mới trong cộng đồng.
+ * Hỗ trợ nhập nội dung văn bản và chọn ảnh từ thiết bị.
+ * Ảnh được tải lên Cloudinary, thông tin bài viết được lưu trữ trên Firebase Realtime Database.
+ */
 public class CreatePostActivity extends AppCompatActivity {
 
+    // Cấu hình Firebase và Cloudinary
     private static final String DB_URL        = "https://petcare-1ce14-default-rtdb.asia-southeast1.firebasedatabase.app";
     private static final String CLOUD_NAME    = "dt9slcin9";
     private static final String UPLOAD_PRESET = "ml_default";
@@ -44,6 +50,7 @@ public class CreatePostActivity extends AppCompatActivity {
     private DatabaseReference db;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
+    // Launcher để chọn ảnh từ thư viện
     private final ActivityResultLauncher<String> pickImage =
             registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
                 if (uri != null) {
@@ -62,14 +69,19 @@ public class CreatePostActivity extends AppCompatActivity {
         db = FirebaseDatabase.getInstance(DB_URL).getReference();
 
         binding.btnBack.setOnClickListener(v -> finish());
+        
+        // Mở thư viện chọn ảnh
         binding.btnAddPhoto.setOnClickListener(v -> pickImage.launch("image/*"));
+        
+        // Gỡ bỏ ảnh đã chọn
         binding.btnRemovePhoto.setOnClickListener(v -> {
             selectedImageUri = null;
             binding.layoutPreview.setVisibility(View.GONE);
         });
 
-        loadCurrentUserInfo();  // Hiện avatar + tên ngay khi mở màn hình
+        loadCurrentUserInfo();  // Hiển thị thông tin người đăng bài
 
+        // Xử lý sự kiện đăng bài
         binding.btnPost.setOnClickListener(v -> {
             String content = binding.etContent.getText().toString().trim();
             if (content.isEmpty()) {
@@ -82,19 +94,20 @@ public class CreatePostActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Hiển thị tên và avatar của người dùng hiện tại lên giao diện soạn bài.
+     */
     private void loadCurrentUserInfo() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) return;
 
         db.child("users").child(user.getUid()).get().addOnSuccessListener(snapshot -> {
-            // Hiện tên
             String name = snapshot.child("displayName").getValue(String.class);
             if (name == null || name.isEmpty())
                 name = snapshot.child("username").getValue(String.class);
             if (name != null && !name.isEmpty())
                 binding.tvUserName.setText(name);
 
-            // Hiện avatar
             String avatarUrl = snapshot.child("avatarUrl").getValue(String.class);
             if (avatarUrl != null && !avatarUrl.isEmpty()) {
                 Glide.with(this)
@@ -106,6 +119,10 @@ public class CreatePostActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Kiểm tra thông tin người dùng và tiến hành tải ảnh lên nếu có.
+     * @param content Nội dung bài viết.
+     */
     private void fetchNameAndUpload(String content) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) {
@@ -131,22 +148,29 @@ public class CreatePostActivity extends AppCompatActivity {
             final String avatarUrl = finalAvatar;
 
             if (selectedImageUri != null) {
+                // Nếu có ảnh, tải lên Cloudinary trước
                 uploadToCloudinary(content, userName, avatarUrl);
             } else {
+                // Nếu không có ảnh, đăng bài trực tiếp
                 executePost(content, userName, "", avatarUrl);
             }
         });
     }
 
+    /**
+     * Tải ảnh lên dịch vụ Cloudinary sử dụng API REST.
+     */
     private void uploadToCloudinary(String content, String userName, String avatarUrl) {
         runOnUiThread(() -> binding.btnPost.setText("Đang tải ảnh..."));
 
         executor.execute(() -> {
             try {
+                // Đọc dữ liệu từ Uri ảnh đã chọn
                 InputStream inputStream = getContentResolver().openInputStream(selectedImageUri);
                 byte[] imageBytes = inputStream.readAllBytes();
                 inputStream.close();
 
+                // Tạo request multipart để tải lên Cloudinary
                 OkHttpClient client = new OkHttpClient();
                 RequestBody requestBody = new MultipartBody.Builder()
                         .setType(MultipartBody.FORM)
@@ -164,6 +188,7 @@ public class CreatePostActivity extends AppCompatActivity {
                 String responseBody = response.body().string();
 
                 if (response.isSuccessful()) {
+                    // Lấy URL ảnh đã tải lên từ kết quả JSON trả về
                     JSONObject json = new JSONObject(responseBody);
                     String imageUrl = json.getString("secure_url");
                     runOnUiThread(() -> executePost(content, userName, imageUrl, avatarUrl));
@@ -177,6 +202,9 @@ public class CreatePostActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Lưu thông tin bài viết vào node "posts" trên Firebase Realtime Database.
+     */
     private void executePost(String content, String userName, String imageUrl, String avatarUrl) {
         String postId = db.child("posts").push().getKey();
         if (postId == null) {
@@ -211,6 +239,6 @@ public class CreatePostActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        executor.shutdown();
+        executor.shutdown(); // Giải phóng Executor khi Activity bị hủy
     }
 }

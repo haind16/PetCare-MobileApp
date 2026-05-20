@@ -8,11 +8,18 @@ import android.os.Build;
 
 import com.nhom08.petcare.data.model.NhacNho;
 
+/**
+ * Lớp hỗ trợ lập lịch nhắc nhở sử dụng AlarmManager.
+ * Cho phép đặt lịch báo thức chính xác cho các hoạt động chăm sóc thú cưng.
+ */
 public class ReminderScheduler {
 
     /**
-     * Đặt lịch AlarmManager cho 1 nhắc nhở.
-     * Khi đến giờ, ReminderReceiver sẽ được gọi.
+     * Đặt lịch AlarmManager cho một mục nhắc nhở.
+     * Khi đến thời gian quy định, hệ thống sẽ gửi một Broadcast đến ReminderReceiver.
+     * @param context Context của ứng dụng
+     * @param item Đối tượng nhắc nhở cần đặt lịch
+     * @param triggerAtMillis Thời điểm thực hiện tính bằng milliseconds
      */
     public static void schedule(Context context, NhacNho item, long triggerAtMillis) {
         AlarmManager alarmManager =
@@ -23,19 +30,21 @@ public class ReminderScheduler {
         intent.putExtra(ReminderReceiver.EXTRA_ID,    item.id);
         intent.putExtra(ReminderReceiver.EXTRA_TITLE, item.loai);
 
+        // Tạo PendingIntent để gửi Broadcast, sử dụng hashCode của ID làm request code để phân biệt các nhắc nhở
         PendingIntent pendingIntent = PendingIntent.getBroadcast(
                 context,
-                item.id.hashCode(), // unique request code theo id
+                item.id.hashCode(), 
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
-        // Android 12+ cần SCHEDULE_EXACT_ALARM permission
+        // Xử lý lập lịch chính xác dựa trên phiên bản Android
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            // Android 12+ yêu cầu quyền SCHEDULE_EXACT_ALARM để đặt lịch chính xác
             if (alarmManager.canScheduleExactAlarms()) {
                 alarmManager.setExactAndAllowWhileIdle(
                         AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent);
             } else {
-                // Fallback nếu chưa cấp quyền — dùng inexact alarm
+                // Fallback nếu chưa cấp quyền — sử dụng phương thức đặt lịch không chính xác
                 alarmManager.set(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent);
             }
         } else {
@@ -45,7 +54,10 @@ public class ReminderScheduler {
     }
 
     /**
-     * Hủy lịch đã đặt (nếu user xóa nhắc nhở thủ công).
+     * Hủy lịch nhắc nhở đã đặt.
+     * Thường dùng khi người dùng xóa nhắc nhở hoặc đã hoàn thành sớm.
+     * @param context Context của ứng dụng
+     * @param reminderId ID của nhắc nhở cần hủy
      */
     public static void cancel(Context context, String reminderId) {
         AlarmManager alarmManager =

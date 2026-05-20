@@ -15,13 +15,17 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * Repository quản lý dữ liệu Thú cưng.
+ * Thực hiện cơ chế Single Source of Truth: Dữ liệu được lưu ở Local (Room) và đồng bộ với Remote (Firebase).
+ */
 public class PetRepository {
 
     private static final String DB_URL = "https://petcare-1ce14-default-rtdb.asia-southeast1.firebasedatabase.app";
 
     private ThuCungDao dao;
     private ExecutorService executor = Executors.newSingleThreadExecutor();
-    // Node "pets" trên Firebase Realtime Database
+    // Tham chiếu đến node "pets" trên Firebase Realtime Database
     private DatabaseReference petsRef =
             FirebaseDatabase.getInstance(DB_URL).getReference("pets");
 
@@ -33,36 +37,39 @@ public class PetRepository {
         void onResult(T result);
     }
 
-    // ── Lấy danh sách pet của user (từ Room) ─────────────────────────────────
-
+    /**
+     * Lấy danh sách thú cưng của người dùng từ cơ sở dữ liệu local (Room).
+     */
     public void getAllPets(String userId, Callback<List<ThuCung>> callback) {
         executor.execute(() ->
                 callback.onResult(dao.getAllByUser(userId)));
     }
 
-    // ── Lấy pet theo id (từ Room) ─────────────────────────────────────────────
-
+    /**
+     * Lấy thông tin chi tiết của một thú cưng theo ID từ Room.
+     */
     public void getPetById(String petId, Callback<ThuCung> callback) {
         executor.execute(() ->
                 callback.onResult(dao.getById(petId)));
     }
 
-    // ── Thêm pet mới: lưu Room + Firebase ────────────────────────────────────
-
+    /**
+     * Thêm thú cưng mới.
+     * Lưu vào Room Database trước để hỗ trợ offline, sau đó đẩy lên Firebase Realtime Database.
+     */
     public void addPet(ThuCung pet, Callback<Void> callback) {
         if (pet.id == null || pet.id.isEmpty())
             pet.id = UUID.randomUUID().toString();
 
-        // 1. Lưu Room trước (offline always works)
+        // 1. Lưu vào Room (Local)
         executor.execute(() -> {
             dao.insert(pet);
 
-            // 2. Lưu Firebase (online)
+            // 2. Đồng bộ lên Firebase (Remote)
             petsRef.child(pet.userId).child(pet.id)
                     .setValue(toFirebaseMap(pet))
                     .addOnSuccessListener(unused -> {})
                     .addOnFailureListener(e -> {
-                        // Firebase thất bại không ảnh hưởng Room — log lỗi thôi
                         android.util.Log.e("PetRepository",
                                 "Firebase addPet failed: " + e.getMessage());
                     });
@@ -71,8 +78,9 @@ public class PetRepository {
         });
     }
 
-    // ── Cập nhật pet: Room + Firebase ────────────────────────────────────────
-
+    /**
+     * Cập nhật thông tin thú cưng ở cả local và remote.
+     */
     public void updatePet(ThuCung pet, Callback<Void> callback) {
         executor.execute(() -> {
             dao.update(pet);
@@ -87,11 +95,11 @@ public class PetRepository {
         });
     }
 
-    // ── Xóa pet: Room + Firebase ──────────────────────────────────────────────
-
+    /**
+     * Xóa thú cưng khỏi database local và remote.
+     */
     public void deletePet(String petId, Callback<Void> callback) {
         executor.execute(() -> {
-            // Lấy pet trước để biết userId (cần để xóa đúng node Firebase)
             ThuCung pet = dao.getById(petId);
             dao.deleteById(petId);
 
@@ -106,8 +114,10 @@ public class PetRepository {
         });
     }
 
-    // ── Sync từ Firebase về Room (gọi khi app start hoặc login) ──────────────
-
+    /**
+     * Đồng bộ dữ liệu từ Firebase về Room.
+     * Thường dùng khi người dùng đăng nhập lần đầu trên thiết bị mới.
+     */
     public void syncFromFirebase(String userId, Callback<Void> callback) {
         petsRef.child(userId).addListenerForSingleValueEvent(
                 new ValueEventListener() {
@@ -137,9 +147,10 @@ public class PetRepository {
                 });
     }
 
-    // ── Helper: convert ThuCung → Map để lưu Firebase ────────────────────────
-    // Không lưu anhUrl (ảnh local path — vô nghĩa trên thiết bị khác)
-
+    /**
+     * Chuyển đổi đối tượng ThuCung sang Map để lưu trữ trên Firebase.
+     * Lưu ý: Không lưu đường dẫn ảnh local lên Firebase vì nó không có ý nghĩa trên thiết bị khác.
+     */
     private java.util.Map<String, Object> toFirebaseMap(ThuCung pet) {
         java.util.Map<String, Object> map = new java.util.HashMap<>();
         map.put("id",         pet.id);

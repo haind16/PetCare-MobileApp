@@ -22,6 +22,11 @@ import com.nhom08.petcare.databinding.FragmentShopBinding;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Fragment Cửa hàng (Shop).
+ * Cho phép người dùng xem danh sách sản phẩm, lọc theo danh mục, tìm kiếm và thêm sản phẩm vào giỏ hàng.
+ * Dữ liệu sản phẩm và giỏ hàng được quản lý qua Firebase Realtime Database.
+ */
 public class ShopFragment extends Fragment {
 
     private static final String DB_URL =
@@ -49,27 +54,38 @@ public class ShopFragment extends Fragment {
         setupSearch();
         loadProductsFromFirebase();
 
+        // Chuyển sang màn hình giỏ hàng
         binding.btnCart.setOnClickListener(v ->
                 startActivity(new Intent(getActivity(), CartActivity.class)));
 
         return binding.getRoot();
     }
 
+    /**
+     * Thiết lập RecyclerView hiển thị danh sách sản phẩm.
+     */
     private void setupRecyclerView() {
         adapter = new ProductAdapter(displayList, item -> addToCart(item));
         binding.rvProducts.setLayoutManager(new LinearLayoutManager(getActivity()));
         binding.rvProducts.setAdapter(adapter);
     }
 
+    /**
+     * Thiết lập các nút lọc danh mục sản phẩm (Thức ăn, Phụ kiện, Thuốc).
+     */
     private void setupCategoryButtons() {
         binding.btnCatFood.setOnClickListener(v -> filterByCategory("Thức ăn"));
         binding.btnAccessory.setOnClickListener(v -> filterByCategory("Phụ kiện"));
         binding.btnMedicine.setOnClickListener(v -> filterByCategory("Thuốc"));
     }
 
+    /**
+     * Lọc sản phẩm theo danh mục được chọn.
+     * @param category Tên danh mục cần lọc.
+     */
     private void filterByCategory(String category) {
         if (currentCategory.equals(category)) {
-            currentCategory = "";
+            currentCategory = ""; // Bỏ lọc nếu nhấn lại cùng 1 danh mục
         } else {
             currentCategory = category;
         }
@@ -78,6 +94,9 @@ public class ShopFragment extends Fragment {
         }
     }
 
+    /**
+     * Thiết lập chức năng tìm kiếm sản phẩm theo tên.
+     */
     private void setupSearch() {
         binding.etSearch.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int st, int c, int a) {}
@@ -88,6 +107,10 @@ public class ShopFragment extends Fragment {
         });
     }
 
+    /**
+     * Kết hợp lọc theo từ khóa và danh mục để hiển thị danh sách sản phẩm phù hợp.
+     * @param keyword Từ khóa tìm kiếm.
+     */
     private void applyFilter(String keyword) {
         displayList.clear();
         for (ProductAdapter.ProductItem p : allProducts) {
@@ -102,6 +125,9 @@ public class ShopFragment extends Fragment {
         adapter.notifyDataSetChanged();
     }
 
+    /**
+     * Lấy danh sách sản phẩm từ Firebase Realtime Database.
+     */
     private void loadProductsFromFirebase() {
         productRef = FirebaseDatabase
                 .getInstance(DB_URL)
@@ -120,7 +146,7 @@ public class ShopFragment extends Fragment {
                     String moTa    = child.child("moTa").getValue(String.class);
                     Long   giaLong = child.child("gia").getValue(Long.class);
                     Long   daBanL  = child.child("daBan").getValue(Long.class);
-                    String anhUrl  = child.child("anhUrl").getValue(String.class); // Thêm lấy URL ảnh
+                    String anhUrl  = child.child("anhUrl").getValue(String.class);
 
                     if (ten == null) continue;
 
@@ -134,7 +160,7 @@ public class ShopFragment extends Fragment {
                             moTa    != null ? moTa    : "",
                             daBan,
                             gia,
-                            anhUrl  != null ? anhUrl  : "" // Truyền url ảnh vào constructor
+                            anhUrl  != null ? anhUrl  : ""
                     ));
                 }
                 applyFilter(binding.etSearch.getText().toString().trim());
@@ -153,6 +179,10 @@ public class ShopFragment extends Fragment {
         productRef.addValueEventListener(productListener);
     }
 
+    /**
+     * Thêm sản phẩm vào giỏ hàng của người dùng hiện tại trên Firebase.
+     * @param item Sản phẩm được chọn.
+     */
     private void addToCart(ProductAdapter.ProductItem item) {
         String userId = FirebaseAuth.getInstance().getCurrentUser() != null
                 ? FirebaseAuth.getInstance().getCurrentUser().getUid()
@@ -163,6 +193,7 @@ public class ShopFragment extends Fragment {
             return;
         }
 
+        // Tham chiếu đến giỏ hàng của user
         DatabaseReference cartRef = FirebaseDatabase
                 .getInstance(DB_URL)
                 .getReference("carts")
@@ -176,11 +207,12 @@ public class ShopFragment extends Fragment {
                 if (qty != null) currentQty = qty.intValue();
             }
 
+            // Tăng số lượng nếu sản phẩm đã có trong giỏ, hoặc thêm mới nếu chưa có
             java.util.Map<String, Object> cartItem = new java.util.HashMap<>();
             cartItem.put("ten",     item.name);
             cartItem.put("gia",     item.gia);
             cartItem.put("danhMuc", item.danhMuc);
-            cartItem.put("anhUrl",  item.anhUrl); // Lưu cả ảnh vào giỏ hàng để sau này dùng
+            cartItem.put("anhUrl",  item.anhUrl);
             cartItem.put("soLuong", currentQty + 1);
 
             cartRef.setValue(cartItem).addOnSuccessListener(unused -> {

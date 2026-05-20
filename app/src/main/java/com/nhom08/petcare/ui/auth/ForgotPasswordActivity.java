@@ -7,6 +7,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.nhom08.petcare.databinding.ActivityForgotPasswordBinding;
 
+/**
+ * Activity xử lý khôi phục mật khẩu.
+ * Gửi email đặt lại mật khẩu thông qua Firebase Authentication.
+ */
 public class ForgotPasswordActivity extends AppCompatActivity {
 
     private ActivityForgotPasswordBinding binding;
@@ -22,7 +26,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
 
         binding.btnBack.setOnClickListener(v -> finish());
 
-        // Nút Gửi mã
+        // Xử lý gửi yêu cầu đặt lại mật khẩu đến email
         binding.btnSendCode.setOnClickListener(v -> {
             String email = binding.etEmail.getText().toString().trim();
             if (email.isEmpty()) {
@@ -31,6 +35,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
             }
             binding.btnSendCode.setEnabled(false);
 
+            // Gọi Firebase API gửi mail reset password
             auth.sendPasswordResetEmail(email)
                     .addOnSuccessListener(unused -> {
                         Toast.makeText(this,
@@ -46,7 +51,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                     });
         });
 
-        // Nút Submit (checkbox)
+        // Hoàn tất và quay lại
         binding.btnSubmit.setOnClickListener(v -> finish());
     }
 }

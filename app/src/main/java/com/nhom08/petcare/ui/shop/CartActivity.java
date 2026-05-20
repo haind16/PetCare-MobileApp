@@ -18,6 +18,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Activity hiển thị giỏ hàng của người dùng.
+ * Cho phép xem danh sách các sản phẩm đã chọn, thay đổi số lượng, xóa sản phẩm và tiến hành thanh toán.
+ */
 public class CartActivity extends AppCompatActivity {
 
     private static final String DB_URL =
@@ -37,7 +41,7 @@ public class CartActivity extends AppCompatActivity {
 
         binding.btnBack.setOnClickListener(v -> finish());
 
-        // Nút lịch sử đơn hàng
+        // Nút xem lịch sử các đơn hàng đã mua
         binding.btnOrderHistory.setOnClickListener(v ->
                 startActivity(new Intent(this, OrderHistoryActivity.class)));
 
@@ -45,6 +49,7 @@ public class CartActivity extends AppCompatActivity {
         setupCartRef();
         loadCartFromFirebase();
 
+        // Xử lý chuyển sang màn hình thanh toán
         binding.btnCheckout.setOnClickListener(v -> {
             if (cartItems.isEmpty()) {
                 Toast.makeText(this, "Giỏ hàng của bạn đang trống!", Toast.LENGTH_SHORT).show();
@@ -54,15 +59,20 @@ public class CartActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Thiết lập danh sách sản phẩm trong giỏ hàng.
+     */
     private void setupRecyclerView() {
         adapter = new CartAdapter(cartItems, new CartAdapter.OnCartChangeListener() {
             @Override
             public void onQuantityChanged(CartAdapter.CartItem item) {
+                // Cập nhật số lượng lên Firebase khi thay đổi trên giao diện
                 updateQtyOnFirebase(item);
                 updateTotal();
             }
             @Override
             public void onItemDeleted(CartAdapter.CartItem item) {
+                // Xóa sản phẩm khỏi giỏ hàng trên Firebase
                 deleteItemOnFirebase(item);
                 updateTotal();
             }
@@ -71,6 +81,9 @@ public class CartActivity extends AppCompatActivity {
         binding.rvCart.setAdapter(adapter);
     }
 
+    /**
+     * Tham chiếu đến node "carts" của người dùng hiện tại trên Firebase.
+     */
     private void setupCartRef() {
         String userId = FirebaseAuth.getInstance().getCurrentUser() != null
                 ? FirebaseAuth.getInstance().getCurrentUser().getUid() : null;
@@ -83,6 +96,9 @@ public class CartActivity extends AppCompatActivity {
                 .getReference("carts").child(userId);
     }
 
+    /**
+     * Lắng nghe dữ liệu giỏ hàng từ Firebase và cập nhật giao diện.
+     */
     private void loadCartFromFirebase() {
         if (cartRef == null) return;
         cartRef.addValueEventListener(new ValueEventListener() {
@@ -113,6 +129,9 @@ public class CartActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Tính toán và hiển thị tổng tiền của các sản phẩm trong giỏ hàng.
+     */
     private void updateTotal() {
         long total = 0;
         for (CartAdapter.CartItem item : cartItems) total += item.gia * item.quantity;
@@ -120,11 +139,17 @@ public class CartActivity extends AppCompatActivity {
                 .format(total).replace(",", ".") + "đ");
     }
 
+    /**
+     * Cập nhật số lượng sản phẩm lên Firebase.
+     */
     private void updateQtyOnFirebase(CartAdapter.CartItem item) {
         if (cartRef == null || item.productId == null) return;
         cartRef.child(item.productId).child("soLuong").setValue(item.quantity);
     }
 
+    /**
+     * Xóa một sản phẩm khỏi node carts trên Firebase.
+     */
     private void deleteItemOnFirebase(CartAdapter.CartItem item) {
         if (cartRef == null || item.productId == null) return;
         cartRef.child(item.productId).removeValue();
