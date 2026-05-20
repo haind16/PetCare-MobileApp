@@ -14,6 +14,10 @@ import com.nhom08.petcare.databinding.ActivityMedicalRecordDetailBinding;
 
 import java.io.File;
 
+/**
+ * Activity hiển thị chi tiết một Hồ sơ y tế.
+ * Lấy dữ liệu từ SQLite (HoSoYTeRepository) và hiển thị thông tin khám, đơn thuốc, tiêm phòng.
+ */
 public class MedicalRecordDetailActivity extends AppCompatActivity {
 
     private ActivityMedicalRecordDetailBinding binding;
@@ -41,6 +45,9 @@ public class MedicalRecordDetailActivity extends AppCompatActivity {
         loadRecord(recordId);
     }
 
+    /**
+     * Tải thông tin hồ sơ y tế từ SQLite Database và cập nhật lên UI.
+     */
     private void loadRecord(String recordId) {
         hoSoRepo.getById(recordId, record -> runOnUiThread(() -> {
             if (record == null) {

@@ -9,6 +9,11 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.FirebaseDatabase;
 import com.nhom08.petcare.databinding.ActivityBankTransferBinding;
 
+/**
+ * Activity xử lý thanh toán bằng phương thức chuyển khoản ngân hàng.
+ * Hiển thị thông tin tài khoản ngân hàng để người dùng chuyển khoản.
+ * Sau khi xác nhận thanh toán, cập nhật trạng thái đơn hàng và xóa giỏ hàng trên Firebase.
+ */
 public class BankTransferActivity extends AppCompatActivity {
 
     private static final String DB_URL =

@@ -9,6 +9,10 @@ import com.nhom08.petcare.data.model.DonThuoc;
 import com.nhom08.petcare.databinding.ActivityAddPrescriptionBinding;
 import java.util.UUID;
 
+/**
+ * Activity để thêm hoặc sửa thông tin đơn thuốc của thú cưng.
+ * Quản lý form nhập liệu gồm tên thuốc, liều lượng, cách dùng.
+ */
 public class AddPrescriptionActivity extends AppCompatActivity {
 
     private ActivityAddPrescriptionBinding binding;
@@ -41,6 +45,9 @@ public class AddPrescriptionActivity extends AppCompatActivity {
         binding.btnSave.setOnClickListener(v -> saveData());
     }
 
+    /**
+     * Kiểm tra rỗng và lưu thông tin đơn thuốc vào cơ sở dữ liệu SQLite.
+     */
     private void saveData() {
         String name   = binding.etMedicineName.getText().toString().trim();
         String dosage = binding.etDosage.getText().toString().trim();

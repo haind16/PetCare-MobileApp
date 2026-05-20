@@ -13,6 +13,10 @@ import com.nhom08.petcare.utils.PetManager;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Activity hiển thị danh sách Thú cưng để người dùng chọn.
+ * Cập nhật PetManager với thú cưng được chọn để dùng toàn cục trong app.
+ */
 public class PetSelectorActivity extends AppCompatActivity {
 
     private ActivityPetSelectorBinding binding;
@@ -40,6 +44,9 @@ public class PetSelectorActivity extends AppCompatActivity {
         loadPets();
     }
 
+    /**
+     * Tải danh sách thú cưng từ Firebase qua Repository.
+     */
     private void loadPets() {
         // Null check trước khi dùng getCurrentUser()
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();

@@ -5,6 +5,10 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import com.nhom08.petcare.databinding.ActivityAddReminderBinding;
 
+/**
+ * Activity cung cấp menu các loại nhắc nhở (Ăn sáng, đi dạo, uống thuốc, v.v.).
+ * Khi người dùng chọn 1 mục, sẽ chuyển hướng sang ReminderDetailActivity.
+ */
 public class AddReminderActivity extends AppCompatActivity {
 
     private ActivityAddReminderBinding binding;

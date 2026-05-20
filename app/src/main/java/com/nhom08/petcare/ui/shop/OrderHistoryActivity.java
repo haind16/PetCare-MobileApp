@@ -21,6 +21,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Activity hiển thị lịch sử các đơn hàng đã đặt của người dùng.
+ * Tải danh sách đơn hàng từ node "orders/{userId}" trên Firebase.
+ * Hiển thị thông tin: Thời gian, trạng thái, tổng tiền, sản phẩm, phương thức thanh toán.
+ */
 public class OrderHistoryActivity extends AppCompatActivity {
 
     private static final String DB_URL =

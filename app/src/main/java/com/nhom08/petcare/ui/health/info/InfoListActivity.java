@@ -17,6 +17,10 @@ import com.nhom08.petcare.databinding.ActivityInfoListBinding;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Activity hiển thị danh sách các thông tin y tế (Bệnh lý, Dinh dưỡng, Thú y).
+ * Sử dụng RecyclerView kết hợp InfoAdapter để hiển thị danh sách tĩnh.
+ */
 public class InfoListActivity extends AppCompatActivity {
 
     private static final String DB_URL = "https://petcare-1ce14-default-rtdb.asia-southeast1.firebasedatabase.app";
@@ -39,6 +43,9 @@ public class InfoListActivity extends AppCompatActivity {
         setupSearch();
     }
 
+    /**
+     * Cấu hình UI và tải dữ liệu dựa trên loại thông tin (bệnh lý, dinh dưỡng, thú y).
+     */
     private void setupByType(String type) {
         List<InfoAdapter.InfoItem> emptyList = new ArrayList<>();
         adapter = new InfoAdapter(emptyList, item -> openDetail(item, type));

@@ -13,6 +13,10 @@ import com.bumptech.glide.Glide;
 import com.nhom08.petcare.R;
 import com.nhom08.petcare.databinding.ActivityInfoDetailBinding;
 
+/**
+ * Activity hiển thị chi tiết một mục thông tin y tế.
+ * Phân loại hiển thị theo 3 type: Bệnh lý (Disease), Dinh dưỡng (Nutrition) và Thú y (Vet).
+ */
 public class InfoDetailActivity extends AppCompatActivity {
 
     private ActivityInfoDetailBinding binding;
@@ -40,7 +44,7 @@ public class InfoDetailActivity extends AppCompatActivity {
 
         binding.tvName.setText(name != null ? name : "");
 
-        // Tải ảnh bìa to bằng Glide
+        // Tải ảnh bìa to bằng Glide (nếu không có thì dùng ảnh nhỏ)
         Glide.with(this)
                 .load(finalImageUrl) // Tải ảnh bìa
                 .placeholder(R.drawable.pet_welcome)

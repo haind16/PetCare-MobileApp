@@ -14,6 +14,12 @@ import com.nhom08.petcare.R;
 import com.nhom08.petcare.data.repository.NhacNhoRepository;
 import com.nhom08.petcare.ui.main.MainActivity;
 
+/**
+ * BroadcastReceiver xử lý nhắc nhở chăm sóc thú cưng.
+ * Khi nhận được Broadcast từ AlarmManager, hiển thị Notification nhắc nhở
+ * và xóa nhắc nhở đã qua khỏi Room Database.
+ * Sử dụng NotificationCompat và NotificationChannel (Android 8+).
+ */
 public class ReminderReceiver extends BroadcastReceiver {
 
     public static final String CHANNEL_ID    = "petcare_reminder";

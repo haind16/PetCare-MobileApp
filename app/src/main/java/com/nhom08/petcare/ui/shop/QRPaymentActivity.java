@@ -10,6 +10,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.nhom08.petcare.R;
 import com.nhom08.petcare.databinding.ActivityQrPaymentBinding;
 
+/**
+ * Activity xử lý thanh toán bằng mã QR Code.
+ * Hiển thị mã QR tĩnh (VietQR) để người dùng quét thanh toán.
+ * Sau khi xác nhận, cập nhật trạng thái đơn hàng thành "da_thanh_toan" và xóa giỏ hàng trên Firebase.
+ */
 public class QRPaymentActivity extends AppCompatActivity {
 
     private static final String DB_URL =

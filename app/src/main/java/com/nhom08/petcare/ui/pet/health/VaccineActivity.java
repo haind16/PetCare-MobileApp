@@ -12,6 +12,10 @@ import com.nhom08.petcare.databinding.ActivityVaccineBinding;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Activity hiển thị danh sách lịch sử tiêm phòng.
+ * Lấy dữ liệu từ bảng LichTiemPhong qua DAO và binding lên UI.
+ */
 public class VaccineActivity extends AppCompatActivity {
 
     private ActivityVaccineBinding binding;
@@ -68,6 +72,9 @@ public class VaccineActivity extends AppCompatActivity {
         loadData();
     }
 
+    /**
+     * Tải danh sách tiêm phòng của thú cưng đang chọn từ DB.
+     */
     private void loadData() {
         if (petId == null) return;
         new Thread(() -> {

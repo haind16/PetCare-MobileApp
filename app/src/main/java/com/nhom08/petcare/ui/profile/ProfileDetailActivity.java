@@ -30,6 +30,11 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+/**
+ * Activity cho phép người dùng xem và chỉnh sửa thông tin hồ sơ cá nhân chi tiết.
+ * Bao gồm: Họ tên, Số điện thoại, Email, Địa chỉ và Ảnh đại diện.
+ * Ảnh đại diện được tải lên Cloudinary trước khi lưu URL vào Firebase Realtime Database.
+ */
 public class ProfileDetailActivity extends AppCompatActivity {
 
     private static final String DB_URL        = "https://petcare-1ce14-default-rtdb.asia-southeast1.firebasedatabase.app";

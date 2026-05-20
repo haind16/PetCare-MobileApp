@@ -17,6 +17,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Activity hiển thị lịch sử thay đổi cân nặng của thú cưng.
+ * Dữ liệu được sắp xếp theo thời gian mới nhất (giảm dần).
+ */
 public class WeightActivity extends AppCompatActivity {
 
     private ActivityWeightBinding binding;
@@ -76,6 +80,9 @@ public class WeightActivity extends AppCompatActivity {
         loadData();
     }
 
+    /**
+     * Tải lịch sử cân nặng từ database và sắp xếp giảm dần theo ngày.
+     */
     private void loadData() {
         if (petId == null) return;
         new Thread(() -> {

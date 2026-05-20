@@ -10,6 +10,10 @@ import com.nhom08.petcare.databinding.ActivityAddMedicalRecordBinding;
 import com.nhom08.petcare.utils.PetManager;
 import java.util.Calendar;
 
+/**
+ * Activity thêm hoặc sửa Hồ sơ y tế cho thú cưng.
+ * Cho phép người dùng nhập thông tin về chiều cao, chẩn đoán của bác sĩ.
+ */
 public class AddMedicalRecordActivity extends AppCompatActivity {
 
     private ActivityAddMedicalRecordBinding binding;
@@ -58,6 +62,10 @@ public class AddMedicalRecordActivity extends AppCompatActivity {
                 String.format("%d/%d/%d", d, m, y));
     }
 
+    /**
+     * Thực hiện lưu hồ sơ y tế vào Local Database qua Repository.
+     * Kiểm tra tính hợp lệ của dữ liệu trước khi thêm/sửa.
+     */
     private void saveRecord() {
         String loaiKham  = binding.etType.getText().toString().trim();
         String phongKham = binding.etClinic.getText().toString().trim();

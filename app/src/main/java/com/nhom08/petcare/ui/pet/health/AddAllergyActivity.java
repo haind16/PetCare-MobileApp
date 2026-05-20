@@ -9,6 +9,10 @@ import com.nhom08.petcare.data.model.DiUng;
 import com.nhom08.petcare.databinding.ActivityAddAllergyBinding;
 import java.util.UUID;
 
+/**
+ * Activity để thêm hoặc sửa thông tin dị ứng của thú cưng.
+ * Dữ liệu được lưu trực tiếp vào bảng DiUng (SQLite) thông qua Thread phụ.
+ */
 public class AddAllergyActivity extends AppCompatActivity {
 
     private ActivityAddAllergyBinding binding;
@@ -37,6 +41,9 @@ public class AddAllergyActivity extends AppCompatActivity {
         binding.btnSave.setOnClickListener(v -> saveData());
     }
 
+    /**
+     * Khởi chạy Worker Thread để lưu thông tin dị ứng, tránh block Main Thread.
+     */
     private void saveData() {
         String content = binding.etContent.getText().toString().trim();
         if (content.isEmpty()) {

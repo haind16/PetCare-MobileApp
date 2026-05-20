@@ -18,6 +18,12 @@ import com.nhom08.petcare.R;
 import com.nhom08.petcare.databinding.ActivityChangePasswordBinding;
 import com.nhom08.petcare.ui.auth.LoginActivity; // Đảm bảo import đúng đường dẫn LoginActivity của bạn
 
+/**
+ * Activity xử lý chức năng đổi mật khẩu tài khoản.
+ * Sử dụng Firebase Authentication: xác thực lại (reauthenticate) bằng mật khẩu cũ,
+ * sau đó cập nhật mật khẩu mới trên cả Authentication và Realtime Database.
+ * Sau khi đổi thành công, tự động đăng xuất và chuyển về LoginActivity.
+ */
 public class ChangePasswordActivity extends AppCompatActivity {
 
     private ActivityChangePasswordBinding binding;

@@ -12,6 +12,10 @@ import com.nhom08.petcare.databinding.ActivityPrescriptionBinding;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Activity hiển thị danh sách đơn thuốc của thú cưng.
+ * Truy xuất dữ liệu từ bảng DonThuoc và hiển thị qua HistoryAdapter.
+ */
 public class PrescriptionActivity extends AppCompatActivity {
 
     private ActivityPrescriptionBinding binding;
@@ -68,6 +72,9 @@ public class PrescriptionActivity extends AppCompatActivity {
         loadData();
     }
 
+    /**
+     * Tải danh sách đơn thuốc từ database (chạy dưới Background Thread).
+     */
     private void loadData() {
         if (petId == null) return;
         new Thread(() -> {

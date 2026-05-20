@@ -13,6 +13,10 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import java.io.File;
 import java.util.List;
 
+/**
+ * Adapter hiển thị danh sách thú cưng trong hộp thoại/màn hình chọn.
+ * Làm mờ (alpha) các item không được chọn và hiển thị biểu tượng tick cho item hiện tại.
+ */
 public class PetSelectorAdapter extends
         RecyclerView.Adapter<PetSelectorAdapter.ViewHolder> {
 

@@ -7,6 +7,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.nhom08.petcare.databinding.ActivityLanguageBinding;
 import java.util.Locale;
 
+/**
+ * Activity cho phép người dùng thay đổi ngôn ngữ hiển thị của ứng dụng.
+ * Hiện hỗ trợ Tiếng Việt. Sử dụng Locale và Configuration để cập nhật ngôn ngữ.
+ */
 public class LanguageActivity extends AppCompatActivity {
 
     private ActivityLanguageBinding binding;

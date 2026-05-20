@@ -9,6 +9,10 @@ import com.nhom08.petcare.data.model.BenhNen;
 import com.nhom08.petcare.databinding.ActivityAddDiseaseBinding;
 import java.util.UUID;
 
+/**
+ * Activity thêm hoặc sửa thông tin bệnh nền của thú cưng.
+ * Xử lý I/O database thông qua Executor/Thread độc lập.
+ */
 public class AddDiseaseActivity extends AppCompatActivity {
 
     private ActivityAddDiseaseBinding binding;
@@ -37,6 +41,9 @@ public class AddDiseaseActivity extends AppCompatActivity {
         binding.btnSave.setOnClickListener(v -> saveData());
     }
 
+    /**
+     * Tạo UUID mới (nếu thêm mới) và insert dữ liệu bệnh nền vào bảng BenhNen.
+     */
     private void saveData() {
         String content = binding.etContent.getText().toString().trim();
         if (content.isEmpty()) {

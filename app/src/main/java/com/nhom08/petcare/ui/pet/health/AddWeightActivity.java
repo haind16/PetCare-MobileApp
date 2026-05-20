@@ -11,6 +11,10 @@ import com.nhom08.petcare.databinding.ActivityAddWeightBinding;
 import java.util.Calendar;
 import java.util.UUID;
 
+/**
+ * Activity thêm hoặc sửa thông tin cân nặng.
+ * Cập nhật lịch sử cân nặng vào bảng CanNang và đồng bộ cân nặng mới nhất sang bảng ThuCung.
+ */
 public class AddWeightActivity extends AppCompatActivity {
 
     private ActivityAddWeightBinding binding;
@@ -56,6 +60,9 @@ public class AddWeightActivity extends AppCompatActivity {
         binding.btnSave.setOnClickListener(v -> saveData());
     }
 
+    /**
+     * Thu thập cân nặng, kiểm tra hợp lệ, lưu vào SQLite và cập nhật cân nặng cho Thú cưng gốc.
+     */
     private void saveData() {
         String weightStr = binding.etWeight.getText().toString().trim();
         if (weightStr.isEmpty()) {

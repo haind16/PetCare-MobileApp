@@ -13,6 +13,10 @@ import com.nhom08.petcare.R;
 
 import java.util.List;
 
+/**
+ * Adapter hiển thị danh sách Hồ sơ y tế.
+ * Xử lý sự kiện click để xem chi tiết một hồ sơ y tế.
+ */
 public class MedicalRecordAdapter extends
         RecyclerView.Adapter<MedicalRecordAdapter.ViewHolder> {
 

@@ -12,6 +12,10 @@ import com.nhom08.petcare.databinding.ActivityDewormingBinding;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Activity hiển thị danh sách lịch sử tẩy giun.
+ * Sử dụng RecyclerView và lấy dữ liệu từ bảng TayGiun qua Background Thread.
+ */
 public class DewormingActivity extends AppCompatActivity {
 
     private ActivityDewormingBinding binding;
@@ -67,6 +71,9 @@ public class DewormingActivity extends AppCompatActivity {
         loadData();
     }
 
+    /**
+     * Tải danh sách lịch tẩy giun từ SQLite và hiển thị lên RecyclerView.
+     */
     private void loadData() {
         if (petId == null) return;
         new Thread(() -> {

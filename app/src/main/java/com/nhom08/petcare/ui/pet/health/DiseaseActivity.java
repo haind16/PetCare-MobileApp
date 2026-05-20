@@ -12,6 +12,10 @@ import com.nhom08.petcare.databinding.ActivityDiseaseBinding;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Activity hiển thị danh sách các bệnh nền của thú cưng.
+ * Sử dụng RecyclerView và truy vấn dữ liệu từ bảng BenhNen trong SQLite.
+ */
 public class DiseaseActivity extends AppCompatActivity {
 
     private ActivityDiseaseBinding binding;
@@ -66,6 +70,9 @@ public class DiseaseActivity extends AppCompatActivity {
         loadData();
     }
 
+    /**
+     * Tải dữ liệu bệnh nền từ database ở Background Thread và bind lên UI.
+     */
     private void loadData() {
         if (petId == null) return;
         new Thread(() -> {

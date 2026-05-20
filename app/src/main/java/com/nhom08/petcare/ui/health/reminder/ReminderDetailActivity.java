@@ -14,6 +14,10 @@ import com.nhom08.petcare.utils.PetManager;
 
 import java.util.Calendar;
 
+/**
+ * Activity tạo chi tiết một lịch nhắc nhở (Nhập ngày/giờ).
+ * Tích hợp DatePickerDialog, TimePickerDialog và gọi ReminderScheduler để báo thức qua HĐH.
+ */
 public class ReminderDetailActivity extends AppCompatActivity {
 
     private ActivityReminderDetailBinding binding;
@@ -70,7 +74,7 @@ public class ReminderDetailActivity extends AppCompatActivity {
             binding.btnSave.setEnabled(false);
 
             repo.add(item, r -> runOnUiThread(() -> {
-                // Đặt AlarmManager sau khi lưu Room thành công
+                // Đặt AlarmManager giao tiếp với Android OS sau khi lưu Room thành công
                 ReminderScheduler.schedule(this, item,
                         selectedDateTime.getTimeInMillis());
 

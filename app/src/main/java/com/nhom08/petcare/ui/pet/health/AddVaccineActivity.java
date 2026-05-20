@@ -11,6 +11,10 @@ import com.nhom08.petcare.databinding.ActivityAddVaccineBinding;
 import java.util.Calendar;
 import java.util.UUID;
 
+/**
+ * Activity thêm hoặc sửa lịch tiêm phòng.
+ * Cung cấp Spinner chọn loại vaccine và DatePicker chọn ngày tiêm/ngày nhắc nhở.
+ */
 public class AddVaccineActivity extends AppCompatActivity {
 
     private ActivityAddVaccineBinding binding;
@@ -75,6 +79,9 @@ public class AddVaccineActivity extends AppCompatActivity {
                 dp.getDayOfMonth(), dp.getMonth() + 1, dp.getYear());
     }
 
+    /**
+     * Validate ngày tiêm phòng và insert bản ghi vào bảng LichTiemPhong.
+     */
     private void saveData() {
         String vaccine = binding.spVaccineType.getSelectedItem().toString();
         String ngayTiem = getDateFromPicker(binding.datePicker);

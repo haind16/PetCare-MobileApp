@@ -12,6 +12,10 @@ import com.nhom08.petcare.databinding.ActivityAllergyBinding;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Activity hiển thị danh sách các chất gây dị ứng của thú cưng.
+ * Sử dụng RecyclerView và truy vấn dữ liệu từ bảng DiUng qua Background Thread.
+ */
 public class AllergyActivity extends AppCompatActivity {
 
     private ActivityAllergyBinding binding;
@@ -66,6 +70,9 @@ public class AllergyActivity extends AppCompatActivity {
         loadData();
     }
 
+    /**
+     * Tải danh sách dị ứng từ SQLite qua Dao và cập nhật RecyclerView trên UI Thread.
+     */
     private void loadData() {
         if (petId == null) return;
         new Thread(() -> {

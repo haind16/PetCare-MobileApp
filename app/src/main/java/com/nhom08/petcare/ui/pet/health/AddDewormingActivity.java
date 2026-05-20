@@ -10,6 +10,10 @@ import com.nhom08.petcare.databinding.ActivityAddDewormingBinding;
 import java.util.Calendar;
 import java.util.UUID;
 
+/**
+ * Activity thêm hoặc sửa lịch tẩy giun của thú cưng.
+ * Sử dụng Thread phụ để insert dữ liệu vào SQLite.
+ */
 public class AddDewormingActivity extends AppCompatActivity {
 
     private ActivityAddDewormingBinding binding;
@@ -48,6 +52,9 @@ public class AddDewormingActivity extends AppCompatActivity {
         binding.btnSave.setOnClickListener(v -> saveData());
     }
 
+    /**
+     * Thu thập dữ liệu từ DatePicker, kiểm tra hợp lệ và lưu xuống Local DB.
+     */
     private void saveData() {
         int day = binding.datePicker.getDayOfMonth();
         int month = binding.datePicker.getMonth() + 1;

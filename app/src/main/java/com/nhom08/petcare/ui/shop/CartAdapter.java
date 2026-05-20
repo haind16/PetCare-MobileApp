@@ -14,6 +14,11 @@ import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Adapter quản lý việc hiển thị danh sách sản phẩm trong giỏ hàng.
+ * Hỗ trợ thay đổi số lượng (tăng/giảm), xóa sản phẩm và hiển thị ảnh sản phẩm bằng Glide.
+ * Thông báo thay đổi cho CartActivity thông qua interface OnCartChangeListener để đồng bộ Firebase.
+ */
 public class CartAdapter extends
         RecyclerView.Adapter<CartAdapter.CartViewHolder> {
 

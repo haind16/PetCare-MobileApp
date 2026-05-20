@@ -14,6 +14,10 @@ import com.nhom08.petcare.R;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Adapter quản lý danh sách thông tin y tế (Bệnh lý, Dinh dưỡng, Thú y).
+ * Hỗ trợ tính năng tìm kiếm (filter) và hiển thị ảnh thumbnail bằng Glide.
+ */
 public class InfoAdapter extends RecyclerView.Adapter<InfoAdapter.InfoViewHolder> {
 
     public static class InfoItem {
@@ -58,6 +62,9 @@ public class InfoAdapter extends RecyclerView.Adapter<InfoAdapter.InfoViewHolder
         notifyDataSetChanged();
     }
 
+    /**
+     * Lọc danh sách theo từ khóa (Tìm kiếm theo tên, mô tả hoặc tag).
+     */
     public void filter(String keyword) {
         displayList.clear();
         if (keyword == null || keyword.trim().isEmpty()) {

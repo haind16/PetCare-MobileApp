@@ -7,6 +7,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.nhom08.petcare.R;
 import com.nhom08.petcare.databinding.ActivitySoundListBinding;
 
+/**
+ * Activity hiển thị danh sách các âm thanh huấn luyện thú cưng.
+ * Hỗ trợ phát âm thanh: Chó, Mèo, Chim và Còi.
+ * Sử dụng MediaPlayer để phát các file audio từ thư mục res/raw.
+ */
 public class SoundListActivity extends AppCompatActivity {
 
     private ActivitySoundListBinding binding;

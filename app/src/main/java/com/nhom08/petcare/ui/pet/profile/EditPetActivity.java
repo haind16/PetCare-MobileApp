@@ -26,6 +26,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
+/**
+ * Activity chỉnh sửa hồ sơ Thú cưng (Tên, ngày sinh, giống, ảnh đại diện).
+ * Có tích hợp CloudinaryUploader để upload ảnh mới và SQLite để cập nhật cân nặng.
+ */
 public class EditPetActivity extends AppCompatActivity {
 
     private ActivityEditPetBinding binding;
@@ -138,6 +142,9 @@ public class EditPetActivity extends AppCompatActivity {
         }).start();
     }
 
+    /**
+     * Kiểm tra dữ liệu đầu vào và gọi upload ảnh (nếu có thay đổi) trước khi lưu.
+     */
     private void validateAndSave() {
         if (currentPet == null) return;
         String ten = binding.etName.getText().toString().trim();

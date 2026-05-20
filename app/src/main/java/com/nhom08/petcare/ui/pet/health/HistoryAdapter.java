@@ -11,6 +11,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.nhom08.petcare.R;
 import java.util.List;
 
+/**
+ * Adapter dùng chung để hiển thị danh sách dạng lịch sử (cân nặng, bệnh lý, tiêm phòng...).
+ * Hỗ trợ menu ngữ cảnh (PopupMenu) cho các thao tác Sửa/Xóa.
+ */
 public class HistoryAdapter extends
         RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder> {
 

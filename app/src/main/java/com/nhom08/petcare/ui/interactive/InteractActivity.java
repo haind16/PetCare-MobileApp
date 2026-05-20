@@ -6,6 +6,11 @@ import android.os.Handler;
 import androidx.appcompat.app.AppCompatActivity;
 import com.nhom08.petcare.databinding.ActivityInteractBinding;
 
+/**
+ * Activity tương tác giải trí với thú cưng.
+ * Cung cấp bộ đếm thời gian chơi (đếm phút) và truy cập danh sách âm thanh huấn luyện.
+ * Sử dụng Handler + Runnable để đếm thời gian chơi mỗi phút.
+ */
 public class InteractActivity extends AppCompatActivity {
 
     private ActivityInteractBinding binding;
