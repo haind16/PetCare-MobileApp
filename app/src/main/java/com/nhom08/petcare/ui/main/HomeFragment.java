@@ -113,6 +113,7 @@ public class HomeFragment extends Fragment {
 
         petRepository.getPetById(pm.getCurrentPetId(), pet -> {
             if (getActivity() == null || binding == null) return;
+            // Khởi tạo luồng phụ để truy vấn dữ liệu Room Database tránh block Main Thread
             new Thread(() -> {
                 // Truy vấn cân nặng gần nhất từ Room
                 CanNangDao canNangDao = AppDatabase.getInstance(requireContext()).canNangDao();
@@ -139,6 +140,7 @@ public class HomeFragment extends Fragment {
                 }
 
                 final float finalWeight = latestWeight;
+                // Cập nhật giao diện người dùng trên Main Thread (UI Thread)
                 getActivity().runOnUiThread(() -> {
                     if (binding == null) return;
                     if (pet == null) { pm.clearCurrentPet(); showEmptyState(); return; }
