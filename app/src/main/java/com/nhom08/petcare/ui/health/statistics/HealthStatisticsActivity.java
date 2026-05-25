@@ -10,6 +10,7 @@ import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.*;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.nhom08.petcare.data.local.AppDatabase;
 import com.nhom08.petcare.data.local.dao.CanNangDao;
 import com.nhom08.petcare.data.local.dao.NhatKyDao;
@@ -232,7 +233,12 @@ public class HealthStatisticsActivity extends AppCompatActivity {
         dataSet.setColors(colors);
         dataSet.setDrawValues(true);
         dataSet.setValueTextSize(9f);
-
+        dataSet.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                return String.valueOf((int) value);
+            }
+        });
         chart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(labels));
         chart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
         chart.getXAxis().setGranularity(1f);
