@@ -75,7 +75,9 @@ public class HealthStatisticsActivity extends AppCompatActivity {
     // ── BIỂU ĐỒ CÂN NẶNG (LINE CHART) ────────────────────────────────────────
 
     /**
-     * Truy vấn dữ liệu cân nặng từ Room và hiển thị lên LineChart.
+     * Truy vấn dữ liệu cân nặng từ Room Database thông qua luồng phụ (Background Thread).
+     * Sau đó xử lý, sắp xếp thời gian và lấy tối đa 12 bản ghi gần nhất.
+     * Dữ liệu cuối cùng được chuyển sang giao diện chính (UI Thread) để vẽ biểu đồ LineChart.
      */
     private void loadWeightChart() {
         if (petId == null) { setupEmptyLineChart(); return; }
@@ -130,7 +132,11 @@ public class HealthStatisticsActivity extends AppCompatActivity {
     }
 
     /**
-     * Cấu hình UI và đổ dữ liệu vào biểu đồ đường.
+     * Cấu hình các tham số giao diện cho biểu đồ đường (LineChart) bằng thư viện MPAndroidChart.
+     * Thiết lập màu sắc, độ dày, làm mượt đường nối và nạp danh sách Entry vào biểu đồ.
+     * 
+     * @param entries Danh sách các điểm dữ liệu (Tọa độ X, Y ứng với thời gian và cân nặng).
+     * @param labels Danh sách các nhãn trục X (Ngày ghi nhận).
      */
     private void renderLineChart(List<Entry> entries, List<String> labels) {
         LineChart chart = binding.lineChartWeight;
@@ -177,6 +183,8 @@ public class HealthStatisticsActivity extends AppCompatActivity {
 
     /**
      * Thống kê số lượng hoạt động nhật ký trong tuần hiện tại.
+     * Dùng luồng phụ truy vấn toàn bộ nhật ký, tìm ngày Thứ Hai của tuần.
+     * Sau đó đếm số lượng hoạt động tương ứng cho các ngày từ Thứ 2 đến Chủ nhật.
      */
     private void loadActivityChart() {
         if (petId == null) { setupEmptyBarChart(); return; }
@@ -220,7 +228,11 @@ public class HealthStatisticsActivity extends AppCompatActivity {
     }
 
     /**
-     * Cấu hình UI và hiển thị biểu đồ cột.
+     * Cấu hình giao diện và hiển thị biểu đồ cột (BarChart) thống kê hoạt động.
+     * Định dạng ValueFormatter được tùy chỉnh để hiển thị số lượng hoạt động dưới dạng số nguyên.
+     *
+     * @param entries Danh sách cột (BarEntry) mang giá trị thống kê đếm được.
+     * @param labels Mảng nhãn trục X (T2, T3... CN).
      */
     private void renderBarChart(List<BarEntry> entries, String[] labels) {
         BarChart chart = binding.barChartActivity;
@@ -239,6 +251,7 @@ public class HealthStatisticsActivity extends AppCompatActivity {
                 return String.valueOf((int) value);
             }
         });
+
         chart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(labels));
         chart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
         chart.getXAxis().setGranularity(1f);
@@ -264,7 +277,13 @@ public class HealthStatisticsActivity extends AppCompatActivity {
     }
 
     /**
-     * Xác định chỉ số ngày trong tuần (0-6) từ chuỗi ngày lưu trong Database.
+     * Hàm phụ trợ: Xác định chỉ số ngày trong tuần (0-6 ứng với T2-CN) 
+     * từ chuỗi ngày lưu trong Database so với ngày Thứ Hai đầu tuần.
+     * Hàm xử lý linh hoạt 2 định dạng ngày: "dd/MM/yyyy" hoặc "ngày D tháng M năm Y".
+     *
+     * @param ngay Chuỗi ngày tháng lấy từ CSDL.
+     * @param monday Đối tượng Calendar đại diện cho 0:00 của ngày Thứ Hai đầu tuần.
+     * @return Chỉ số từ 0 (T2) đến 6 (CN), hoặc -1 nếu không hợp lệ/nằm ngoài tuần.
      */
     private int getDayIndexInWeek(String ngay, Calendar monday) {
         if (ngay == null || ngay.isEmpty()) return -1;
